@@ -10,6 +10,7 @@ Static multi-page site (plain HTML/CSS/JS — no build step). Deploys straight t
 | `interiors.html` | "Step Inside Excellence" interior gallery |
 | `services.html` | Services, process, why us, beyond the build |
 | `about.html` | Story, mission, team (David & Oliver), videos |
+| `builder.html` | **Build Your Trailer** — interactive designer (size, colors, wraps, drag-and-drop gadgets, branding, kitchen floor plan) that emails the design for an estimate |
 | `contact.html` | Quote request form + direct contacts / Instagram |
 
 ## Adding photos & videos
@@ -32,6 +33,12 @@ Tip: keep photos ~1600px wide JPGs, and compress phone videos before adding
 The form posts to [FormSubmit](https://formsubmit.co) → `battleborntrailers@gmail.com`.
 **The very first submission sends an activation email to that inbox — click "Activate" once** and every form after that is delivered.
 To change the destination email, edit the `action` URL in `contact.html`.
+
+## Trailer builder (`builder.html`)
+Everything runs in the browser — no backend. Customers design a trailer and hit **Send design for estimate**;
+the shop gets an email (via FormSubmit, same inbox as the contact form) with the full spec list and a link that reopens the exact design.
+Equipment sizes, cooking-style presets and colors live at the top of the `<script>` in `builder.html` (`EQUIP`, `CUISINES`, `COLORS`).
+The home-page preview image is `assets/img/builder-preview.jpg`.
 
 ## Deploy
 Import the repo in Vercel → Framework preset **Other** → no build command, output directory `/`.
