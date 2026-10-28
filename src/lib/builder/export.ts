@@ -1,7 +1,7 @@
 /* Browser-only: turn a design into a PNG. Embeds the page's web fonts into the SVG so the
    business name, sign and labels render in the right typeface in the downloaded / emailed image. */
 
-import { SCENE_H, W } from "./constants";
+import { ASPECT, W } from "./constants";
 import type { Design } from "./design";
 import { standaloneSvg, type View } from "./scene";
 
@@ -61,21 +61,24 @@ export function fontCss() {
   return fontCssPromise;
 }
 
-export async function designToPng(d: Design, opts: { scale?: number; night?: boolean; view?: View } = {}): Promise<string | null> {
+export async function designToPng(d: Design, opts: { scale?: number; night?: boolean; view?: View; type?: "png" | "jpeg" } = {}): Promise<string | null> {
   const scale = opts.scale ?? 2;
   const svg = standaloneSvg(d, { view: opts.view ?? "ext", night: opts.night, fontCss: await fontCss() });
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
       const c = document.createElement("canvas");
-      c.width = W * scale;
-      c.height = SCENE_H * scale;
+      const h = Math.round(W / ASPECT);
+      c.width = Math.round(W * scale);
+      c.height = Math.round(h * scale);
       const ctx = c.getContext("2d");
       if (!ctx) return resolve(null);
       ctx.scale(scale, scale);
-      ctx.drawImage(img, 0, 0, W, SCENE_H);
+      ctx.fillStyle = opts.night ? "#0b0f17" : "#f6f8fa";
+      ctx.fillRect(0, 0, W, h);
+      ctx.drawImage(img, 0, 0, W, h);
       try {
-        resolve(c.toDataURL("image/png"));
+        resolve(opts.type === "jpeg" ? c.toDataURL("image/jpeg", 0.9) : c.toDataURL("image/png"));
       } catch {
         resolve(null);
       }

@@ -168,8 +168,11 @@
   .tb-modal h2 { font-size: 2rem; margin-bottom: 6px; }
   .tb-modal .x { position: absolute; top: 14px; right: 14px; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line-strong); background: none; color: var(--white); display: grid; place-items: center; }
   .tb-modal .x svg { width: 18px; height: 18px; }
-  .tb-modal .preview { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); margin: 14px 0; background: #e9edf2; aspect-ratio: 1500 / 560; }
+  .tb-modal .preview { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); margin: 14px 0; background: #e9edf2; aspect-ratio: 2.2; }
   .tb-modal .preview img { display: block; width: 100%; height: auto; }
+  .tb-modal .preview-row { display: flex; gap: 10px; align-items: center; margin: -4px 0 14px; flex-wrap: wrap; }
+  .tb-modal .preview-row img { width: 120px; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+  .tb-modal .preview-row span { flex: 1; min-width: 160px; font-size: 0.85rem; color: var(--steel-dim); }
   .tb-modal .mform { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
   .tb-modal .mform .full { grid-column: 1 / -1; }
   .tb-modal label.f { display: block; font-family: var(--f-label); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; color: var(--steel-dim); margin-bottom: 6px; }

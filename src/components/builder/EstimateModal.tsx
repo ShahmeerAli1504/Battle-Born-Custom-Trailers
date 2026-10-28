@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { Icon } from "@/components/ui/Icon";
 import type { Design } from "@/lib/builder/design";
 import { designToPng } from "@/lib/builder/export";
+import { specSections } from "@/lib/builder/scene";
 import { TIMELINES } from "@/lib/content";
 import { designRequestSchema, fieldErrors } from "@/lib/schemas";
 import { primaryPhone, site } from "@/lib/site";
@@ -21,7 +22,8 @@ type Props = {
 type Result = { ok: boolean; message?: string; summary: string };
 
 export function EstimateModal({ design, night, specs, onClose, onDownload, designLink }: Props) {
-  const [image, setImage] = useState<string | null>(null);
+  const [images, setImages] = useState<{ exterior: string | null; night: string | null; plan: string | null } | null>(null);
+  const image = images?.exterior ?? null;
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
@@ -29,7 +31,13 @@ export function EstimateModal({ design, night, specs, onClose, onDownload, desig
 
   useEffect(() => {
     let alive = true;
-    designToPng(design, { scale: 1.4, night }).then((url) => alive && setImage(url));
+    // Three pictures go to the shop: outside by day, outside at night, and the kitchen floor plan.
+    const opts = { scale: 1.3, type: "jpeg" as const };
+    Promise.all([
+      designToPng(design, { ...opts, night: false, view: "ext" }),
+      designToPng(design, { ...opts, night: true, view: "ext" }),
+      designToPng(design, { ...opts, night: false, view: "plan" }),
+    ]).then(([exterior, nightImg, plan]) => alive && setImages({ exterior, night: nightImg, plan }));
     document.body.style.overflow = "hidden";
     firstField.current?.focus();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -47,7 +55,7 @@ export function EstimateModal({ design, night, specs, onClose, onDownload, desig
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const s = (k: string) => String(fd.get(k) ?? "").trim();
-    const payload = { name: s("name"), phone: s("phone"), email: s("email"), timeline: s("timeline"), notes: s("notes"), website: s("website"), design, image };
+    const payload = { name: s("name"), phone: s("phone"), email: s("email"), timeline: s("timeline"), notes: s("notes"), website: s("website"), design, images: images ?? {} };
 
     const parsed = designRequestSchema.safeParse(payload);
     if (!parsed.success) {
@@ -59,15 +67,18 @@ export function EstimateModal({ design, night, specs, onClose, onDownload, desig
     setErrors({});
     setSending(true);
 
-    const specText = specs.map(([k, v]) => `• ${k}: ${v}`).join("\n");
+    const specText = specSections(design)
+      .map((sec) => `${sec.title.toUpperCase()}\n${sec.rows.map((row) => `• ${row.label}: ${row.value}`).join("\n")}`)
+      .join("\n\n");
     const summary = [
       `Name:     ${payload.name}`,
       `Phone:    ${payload.phone}`,
       `Email:    ${payload.email}`,
       `Launch:   ${payload.timeline}`,
       "",
-      "DESIGN SPECS",
       specText,
+      "",
+      `Pictures: outside (day), outside (night), floor plan`,
       payload.notes ? `\nNotes: ${payload.notes}` : "",
     ].join("\n");
 
@@ -100,6 +111,13 @@ export function EstimateModal({ design, night, specs, onClose, onDownload, desig
             <h2 id="mTitle">Get your free estimate</h2>
             <p className="m-0 text-steel-dim">Your design and full spec list are attached automatically. David or Oliver will follow up with pricing and next steps.</p>
             <div className="preview">{image && <img src={image} alt="Your trailer design" />}</div>
+            {images && (
+              <div className="preview-row" aria-label="Also included">
+                {images.night && <img src={images.night} alt="Your trailer at night" />}
+                {images.plan && <img src={images.plan} alt="Your kitchen floor plan" />}
+                <span>These pictures and your full spec list are sent with your request.</span>
+              </div>
+            )}
             <form className="mform" onSubmit={onSubmit} noValidate>
               <input type="text" name="website" className="hp" tabIndex={-1} autoComplete="off" aria-hidden="true" />
               <div>
@@ -141,8 +159,8 @@ export function EstimateModal({ design, night, specs, onClose, onDownload, desig
               </div>
               <div className="full flex flex-wrap items-center justify-between gap-2.5">
                 <small className="text-steel-dim">Free consultation · Transparent pricing · Hablamos Español</small>
-                <button className="btn btn-spark" type="submit" disabled={sending}>
-                  {sending ? "Sending…" : "Send to Battle Born"}
+                <button className="btn btn-spark" type="submit" disabled={sending || !images}>
+                  {sending ? "Sending…" : !images ? "Preparing pictures…" : "Send to Battle Born"}
                 </button>
               </div>
             </form>

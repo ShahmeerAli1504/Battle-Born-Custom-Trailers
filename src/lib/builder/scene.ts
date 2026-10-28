@@ -432,7 +432,8 @@ export const renderScene = (d: Design, view: View, night: boolean) => (view === 
 export function standaloneSvg(d: Design, opts: { view?: View; night?: boolean; fontCss?: string } = {}): string {
   const view = opts.view ?? "ext";
   const style = opts.fontCss ? `<style>${opts.fontCss}</style>` : "";
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox(d, view)}" width="${W}" height="${SCENE_H}">${style}${renderScene(d, view, !!opts.night)}</svg>`;
+  // Output matches the view box shape (W × W/ASPECT), so nothing is letterboxed.
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox(d, view)}" width="${W}" height="${Math.round(W / ASPECT)}">${style}${renderScene(d, view, !!opts.night)}</svg>`;
 }
 
 /* ---------------- spec list (used in the UI and in the estimate email) ---------------- */
@@ -470,6 +471,87 @@ export function specList(d: Design): [string, string][] {
   out.push(["Kitchen", d.equip.map((k) => EQUIP[k]?.n).filter(Boolean).join(", ") + (pd.hasCook ? ", hood + fire suppression" : "")]);
   if (pd.over) out.push(["Note", `Equipment needs ~${pd.rec} ft`]);
   return out;
+}
+
+/* ---------------- full spec sheet (estimate email) ---------------- */
+const COLOR_NAMES: Record<string, string> = {
+  "#c62828": "Red", "#ff7a1a": "Orange", "#f2b705": "Yellow", "#1f8a4c": "Green", "#2457d6": "Blue", "#0f1b33": "Navy",
+  "#111317": "Black", "#f3f4f6": "White", "#ffffff": "White", "#7a4a2a": "Brown", "#8e24aa": "Purple", "#9aa4b0": "Silver",
+  "#00a0a8": "Teal", "#ff4f9a": "Pink", "#2a2f38": "Charcoal", "#c9a24a": "Gold",
+};
+export const colorName = (hex: string) => `${COLOR_NAMES[hex.toLowerCase()] ?? "Custom"} (${hex.toUpperCase()})`;
+
+export type SpecRow = { label: string; value: string; swatch?: string };
+export type SpecSection = { title: string; rows: SpecRow[] };
+
+/** Everything the customer chose, grouped for the shop. */
+export function specSections(d: Design): SpecSection[] {
+  const pd = planData(d);
+  const wrapName = WRAPS.find((w) => w[0] === d.wrap)?.[1] ?? d.wrap;
+  const fontName = (f: string) => ({ "Big Shoulders Display": "Bold", Bungee: "Street", Pacifico: "Script", Lobster: "Retro", Rye: "Western", "Permanent Marker": "Marker", "Barlow Condensed": "Clean" })[f] ?? f;
+  const yes = (b: boolean) => (b ? "Yes" : "No");
+  const label: Partial<Record<Item["type"], string>> = {
+    window: "Service window", window_s: "Small window", awning: "Awning", counter: "Serving shelf", door: "Side door",
+    menu: "Menu board", tv: "TV menu", ac: "A/C unit", vent: "Roof vent", sign: "Roof sign",
+  };
+  // position along the trailer, measured from the hitch end
+  const at = (i: Item) => `${Math.max(0, i.x).toFixed(1)} ft from hitch end`;
+
+  const pieces = d.items
+    .filter((i) => label[i.type])
+    .sort((a, b) => a.x - b.x)
+    .map((i) => ({ label: label[i.type]!, value: i.type === "sign" ? `"${(d.signText || "EATS").toUpperCase()}" · ${at(i)}` : at(i) }));
+  const decals = d.items.filter((i) => i.type === "decal").map((i) => i.emoji || "⭐");
+  const texts = d.items.filter((i) => i.type === "text" && !i.role && i.text).map((i) => `"${i.text}" (${fontName(i.font || "Barlow Condensed")})`);
+
+  const sections: SpecSection[] = [
+    {
+      title: "Trailer",
+      rows: [
+        { label: "Length", value: `${d.len} ft box` },
+        { label: "Axles", value: `${axles(d.len)} (${["", "single", "tandem", "triple"][axles(d.len)]})` },
+        { label: "Diamond plate", value: yes(d.plate) },
+        { label: "Marquee lights", value: yes(d.lights) },
+        { label: "Rear porch", value: yes(d.porch) },
+        { label: "Chrome wheels", value: yes(d.chrome) },
+        { label: "On the tongue", value: [d.propane && "Propane tanks", d.generator && "Generator box", d.smoker && "BBQ smoker"].filter(Boolean).join(", ") || "Nothing" },
+      ],
+    },
+    {
+      title: "Wrap & colors",
+      rows: [
+        { label: "Wrap design", value: wrapName },
+        { label: "Body color", value: colorName(d.body), swatch: d.body },
+        { label: "Accent color", value: colorName(d.accent), swatch: d.accent },
+        { label: "Trim color", value: colorName(d.trim), swatch: d.trim },
+      ],
+    },
+    {
+      title: "Branding",
+      rows: [
+        { label: "Business name", value: d.name || "—" },
+        { label: "Name font", value: fontName(d.font) },
+        { label: "Text color", value: colorName(d.text), swatch: d.text },
+        { label: "Tagline", value: d.tag || "—" },
+        { label: "Phone / handle on trailer", value: d.phone || "—" },
+        ...(texts.length ? [{ label: "Extra text", value: texts.join(", ") }] : []),
+        ...(decals.length ? [{ label: "Food decals", value: decals.join("  ") }] : []),
+      ],
+    },
+    { title: "Exterior pieces", rows: pieces.length ? pieces : [{ label: "Pieces", value: "None added" }] },
+    {
+      title: "Kitchen",
+      rows: [
+        { label: "Cooking style", value: CUISINES[d.cuisine].n },
+        ...d.equip.map((k) => ({ label: EQUIP[k].n, value: `${EQUIP[k].w} ft · ${EQUIP[k].row === "b" ? "back wall" : "front wall"}${EQUIP[k].req ? " · required" : ""}` })),
+        ...(pd.hasCook ? [{ label: "Hood + fire suppression", value: "Over the cooking line" }] : []),
+        { label: "Back wall used", value: `${pd.used.b.toFixed(1)} of ${pd.avail.b} ft` },
+        { label: "Front wall used", value: `${pd.used.f.toFixed(1)} of ${pd.avail.f} ft` },
+        ...(pd.over ? [{ label: "⚠ Fit", value: `Equipment needs about a ${pd.rec} ft trailer` }] : []),
+      ],
+    },
+  ];
+  return sections;
 }
 
 /* ---------------- control thumbnails ---------------- */

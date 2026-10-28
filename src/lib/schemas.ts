@@ -38,6 +38,13 @@ export const quoteSchema = z.object({
 export type QuoteInput = z.input<typeof quoteSchema>;
 export type Quote = z.output<typeof quoteSchema>;
 
+const designImage = z
+  .string()
+  .max(2_500_000)
+  .regex(/^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/)
+  .nullable()
+  .optional();
+
 /** Builder "send design for estimate" request. The design itself is validated by designSchema. */
 export const designRequestSchema = z.object({
   name,
@@ -46,13 +53,12 @@ export const designRequestSchema = z.object({
   timeline: optionalEnum(TIMELINES),
   notes: optionalText(2000),
   design: z.unknown(),
-  /** PNG snapshot from the builder, attached to the email. */
-  image: z
-    .string()
-    .max(4_000_000)
-    .regex(/^data:image\/png;base64,[A-Za-z0-9+/=]+$/)
+  /** Pictures rendered by the builder, attached to the email (outside by day, at night, and the floor plan). */
+  images: z
+    .object({ exterior: designImage, night: designImage, plan: designImage })
+    .partial()
     .optional()
-    .nullable(),
+    .default({}),
   website: z.string().max(500).optional().default(""),
 });
 
