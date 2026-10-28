@@ -1,45 +1,82 @@
-# Battle Born Custom Trailers — Website
+# Battle Born Custom Trailers — Website v2
 
-Static multi-page site (plain HTML/CSS/JS — no build step). Deploys straight to Vercel.
+Next.js (App Router) · TypeScript · Tailwind CSS v4 · Zod · Nodemailer (Gmail SMTP). Deploys to Vercel.
 
-## Pages
-| File | Page |
-|---|---|
-| `index.html` | Home — logo video hero, flagship build, recent builds, interiors preview, services, story video |
-| `builds.html` | Completed builds gallery (filters + lightbox), Mendoza's flagship spotlight, video build tours |
-| `interiors.html` | "Step Inside Excellence" interior gallery |
-| `services.html` | Services, process, why us, beyond the build |
-| `about.html` | Story, mission, team (David & Oliver), videos |
-| `builder.html` | **Build Your Trailer** — interactive designer (size, colors, wraps, drag-and-drop gadgets, branding, kitchen floor plan) that emails the design for an estimate |
-| `contact.html` | Quote request form + direct contacts / Instagram |
+## Quick start
+
+```bash
+npm install
+cp .env.example .env.local   # then fill in the Gmail app password
+npm run dev                  # http://localhost:3000
+```
+
+Other scripts: `npm run build` · `npm start` · `npm run lint` · `npm run typecheck`
+
+## Email setup (Gmail SMTP)
+
+The quote form and the trailer builder send email from the server (`/api/quote`, `/api/design`) through Gmail.
+
+1. Sign in to the Gmail account that will send the emails (e.g. battleborntrailers@gmail.com).
+2. Turn on **2-Step Verification** in Google Account → Security.
+3. Go to **App passwords**, create one called "Website", and copy the 16-character password.
+4. Set these environment variables in `.env.local` **and** in Vercel → Project → Settings → Environment Variables:
+
+| Variable | Example | What it does |
+|---|---|---|
+| `GMAIL_USER` | `battleborntrailers@gmail.com` | Gmail account that sends |
+| `GMAIL_APP_PASSWORD` | `abcd efgh ijkl mnop` | App password from step 3 |
+| `CONTACT_TO_EMAIL` | `battleborntrailers@gmail.com` | Inbox that receives leads (comma-separate several) |
+| `SEND_CONFIRMATION_EMAIL` | `true` | Sends customers an automatic bilingual "we got it" email |
+| `NEXT_PUBLIC_SITE_URL` | `https://battleborncustomtrailers.com` | Used for design links, sitemap and social previews |
+
+Lead emails use **Reply-To = the customer**, so hitting Reply answers them directly.
+Builder emails include the design image, the full spec list and an "Open this design" link.
+
+## Project layout
+
+```
+src/
+  app/                    pages (/, /builds, /interiors, /services, /about, /builder, /contact)
+    api/quote/route.ts    quote form → email
+    api/design/route.ts   trailer design → email with PNG + reopen link
+    globals.css           design system (tokens + components, Tailwind v4)
+    sitemap.ts, robots.ts
+  components/
+    builder/              Trailer builder (React) + scoped CSS
+    gallery/              Builds grid w/ filters, interiors grid, flagship spotlight, lightbox
+    forms/QuoteForm.tsx
+    layout/               Header (mobile menu), footer
+    motion/               Scroll reveal, sparks, count-up
+  lib/
+    content.ts            ← gallery photos, videos, services text
+    site.ts               ← phone numbers, email, Instagram handles
+    schemas.ts            Zod validation shared by forms and API
+    builder/              Builder data, presets, SVG scene renderer, PNG export
+    mailer.ts             Gmail transport + email templates
+public/assets/            images & videos
+```
 
 ## Adding photos & videos
-Everything in the galleries comes from **`assets/js/gallery-data.js`**.
 
-1. Put the photo in `assets/img/builds/` (or `assets/img/interiors/`).
-2. Add a line to `BB_BUILDS` (or `BB_INTERIORS`):
-   ```js
-   { img: "assets/img/builds/new-trailer.jpg", title: "New Trailer", text: "Short description", cat: "wrap" },
+1. Put the photo in `public/assets/img/builds/` (or `interiors/`).
+2. Add a line to `BUILDS` (or `INTERIORS`) in `src/lib/content.ts`:
+   ```ts
+   { img: "/assets/img/builds/new-trailer.jpg", title: "New Trailer", text: "Short description", cat: "wrap" },
    ```
-   `cat` options: `wrap` (custom wrap), `clean` (solid color build), `shop` (in the shop).
-3. For videos: put the `.mp4` in `assets/video/` and add a line to `BB_VIDEOS`.
+   `cat`: `wrap` (custom wrap) · `clean` (solid-color build) · `shop` (in the shop).
+3. Videos: put the `.mp4` in `public/assets/video/` and add a line to `VIDEOS`.
 
-The first item in `BB_BUILDS` is shown large on the Builds page; the first 6 appear on the Home page.
+The first build is shown large on /builds; the first 6 appear on the home page. Images are automatically resized and served as AVIF/WebP.
 
-Tip: keep photos ~1600px wide JPGs, and compress phone videos before adding
+Tip: keep photos ~1600px wide JPGs, and compress phone videos first
 (`ffmpeg -i in.mp4 -vf scale=720:-2 -crf 27 -movflags +faststart out.mp4`).
 
-## Contact form
-The form posts to [FormSubmit](https://formsubmit.co) → `battleborntrailers@gmail.com`.
-**The very first submission sends an activation email to that inbox — click "Activate" once** and every form after that is delivered.
-To change the destination email, edit the `action` URL in `contact.html`.
+## Trailer builder
 
-## Trailer builder (`builder.html`)
-Everything runs in the browser — no backend. Customers design a trailer and hit **Send design for estimate**;
-the shop gets an email (via FormSubmit, same inbox as the contact form) with the full spec list and a link that reopens the exact design.
-Equipment sizes, cooking-style presets and colors live at the top of the `<script>` in `builder.html` (`EQUIP`, `CUISINES`, `COLORS`).
-The home-page preview image is `assets/img/builder-preview.jpg`.
+Equipment sizes, cooking presets, colors and gadgets live in `src/lib/builder/constants.ts`; templates in `src/lib/builder/design.ts`.
+Share links (`/builder#d=…`) from the old site still open.
 
 ## Deploy
-Import the repo in Vercel → Framework preset **Other** → no build command, output directory `/`.
-`vercel.json` enables clean URLs (`/builds` instead of `/builds.html`).
+
+Push to GitHub → Vercel auto-detects Next.js (no settings needed). Add the environment variables above, then redeploy.
+Old URLs like `/builds.html` permanently redirect to `/builds`.
