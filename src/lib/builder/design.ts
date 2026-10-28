@@ -80,6 +80,15 @@ export const mk = (type: GadgetType, x: number, extra: Partial<Item> = {}): Item
 
 /* ---------------- presets ---------------- */
 
+/** Starting point: a bare trailer with nothing on it. The customer makes every choice. */
+export function emptyDesign(): Design {
+  return {
+    len: 20, wrap: "solid", body: "#e9edf2", accent: "#c2cad4", trim: "#2a2f38", text: "#111317", font: "Big Shoulders Display",
+    plate: false, lights: false, porch: false, chrome: false, propane: false, generator: false, smoker: false,
+    cuisine: "other", name: "", tag: "", phone: "", signText: "", equip: [], items: [],
+  };
+}
+
 export function preset(kind: PresetKey): Design {
   const base: Omit<Design, "equip" | "items"> = {
     len: 20, wrap: "twotone", body: "#c62828", accent: "#111317", trim: "#111317", text: "#ffffff", font: "Big Shoulders Display",

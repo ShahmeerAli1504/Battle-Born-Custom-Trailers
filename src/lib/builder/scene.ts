@@ -3,6 +3,7 @@
 
 import { ASPECT, BOT, CUISINES, EQUIP, GROUND, H, LENGTHS, PPF, SCENE_H, TOP, W, WRAPS, type EquipKey, type WrapStyle } from "./constants";
 import { itemW, type Design, type Item } from "./design";
+import { drawFancyWrap, isFancyWrap } from "./wraps";
 
 export type View = "ext" | "plan";
 
@@ -208,7 +209,7 @@ function wrapLayer(d: Design, g: Layout): string {
     case "checker":
       return `<rect x="${bx}" y="${BOT - 96}" width="${bw}" height="44" fill="url(#checker)"/><rect x="${bx}" y="${BOT - 100}" width="${bw}" height="4" fill="${d.trim}"/><rect x="${bx}" y="${BOT - 52}" width="${bw}" height="4" fill="${d.trim}"/>`;
     default:
-      return "";
+      return isFancyWrap(d.wrap) ? drawFancyWrap(d.wrap, { x: bx, y: TOP, w: bw, h: H }, d, "scene-") : "";
   }
 }
 
@@ -413,6 +414,18 @@ export function renderPlan(d: Design, night: boolean): string {
   return s;
 }
 
+/** Before the customer picks a length: just the lot (sky, ground, faint outline) — nothing preloaded. */
+export function renderEmptyStage(night: boolean): string {
+  const sky = night ? ["#05070c", "#0d1730"] : ["#d6e0ea", "#eef2f6"];
+  const line = night ? "#2a3550" : "#b8c0c9";
+  const bx = (W - 20 * PPF) / 2;
+  return `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs>
+  <rect x="-800" y="-200" width="${W + 1600}" height="1000" fill="url(#sky)"/>
+  <rect x="-800" y="${GROUND}" width="${W + 1600}" height="400" fill="${night ? "#0e131c" : "#cfd5dc"}"/>
+  <rect x="${bx}" y="${TOP}" width="${20 * PPF}" height="${H}" rx="8" fill="none" stroke="${line}" stroke-width="3" stroke-dasharray="14 10"/>
+  <line x1="${bx + 20 * PPF * 0.45}" y1="${GROUND - 2}" x2="${bx + 20 * PPF * 0.67}" y2="${GROUND - 2}" stroke="${line}" stroke-width="3" stroke-dasharray="14 10"/>`;
+}
+
 export const renderScene = (d: Design, view: View, night: boolean) => (view === "ext" ? renderExterior(d, night) : renderPlan(d, night));
 
 /** A complete standalone SVG document (for PNG export / email image). */
@@ -460,15 +473,17 @@ export function specList(d: Design): [string, string][] {
 }
 
 /* ---------------- control thumbnails ---------------- */
-export function wrapThumb(w: WrapStyle): string {
-  const b = "#2457d6", a = "#ff7a1a";
-  const m: Record<WrapStyle, string> = {
+/** Picker thumbnail. Pass the customer's colors to preview each wrap in them. */
+export function wrapThumb(w: WrapStyle, cols?: { body: string; accent: string; trim: string }): string {
+  const b = cols?.body ?? "#2457d6", a = cols?.accent ?? "#ff7a1a", t = cols?.trim ?? "#111317";
+  if (isFancyWrap(w)) return `<rect width="80" height="48" fill="${b}"/>${drawFancyWrap(w, { x: 0, y: 0, w: 80, h: 48 }, { body: b, accent: a, trim: t }, `th-${w}-`)}`;
+  const m: Record<string, string> = {
     solid: "",
     twotone: `<rect y="26" width="80" height="22" fill="${a}"/>`,
     stripe: `<rect y="28" width="80" height="8" fill="${a}"/>`,
     swoosh: `<path d="M0 48V34C30 40 50 14 80 8V48Z" fill="${a}"/>`,
     flames: `<path d="M0 48Q6 34 10 24Q14 36 20 40Q24 26 30 18Q34 34 40 40Q46 28 50 22Q54 36 60 40Q64 30 70 24Q74 36 80 38V48Z" fill="${a}"/>`,
-    checker: `<g fill="#111">${Array.from({ length: 10 }, (_, i) => `<rect x="${i * 8}" y="${30 + (i % 2) * 5}" width="4" height="5"/><rect x="${i * 8 + 4}" y="${30 + ((i + 1) % 2) * 5}" width="4" height="5"/>`).join("")}</g><rect y="30" width="80" height="10" fill="${a}" opacity=".5"/>`,
+    checker: `<g fill="${t}">${Array.from({ length: 10 }, (_, i) => `<rect x="${i * 8}" y="${30 + (i % 2) * 5}" width="4" height="5"/><rect x="${i * 8 + 4}" y="${30 + ((i + 1) % 2) * 5}" width="4" height="5"/>`).join("")}</g><rect y="30" width="80" height="10" fill="${a}" opacity=".5"/>`,
   };
   return `<rect width="80" height="48" fill="${b}"/>${m[w]}`;
 }

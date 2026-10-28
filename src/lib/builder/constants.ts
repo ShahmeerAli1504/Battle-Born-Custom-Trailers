@@ -1,5 +1,7 @@
 /* Trailer builder — static data. Equipment sizes, cooking presets and colors live here. */
 
+import { FANCY_WRAPS } from "./wraps";
+
 /** Scene geometry (SVG units). PPF = pixels per foot of trailer length. */
 export const W = 1500;
 export const SCENE_H = 560;
@@ -21,7 +23,7 @@ export const COLORS = {
 } as const;
 export type ColorKey = keyof typeof COLORS;
 
-export const WRAPS = [
+export const BASIC_WRAPS = [
   ["solid", "Solid"],
   ["twotone", "Two-tone"],
   ["stripe", "Stripe"],
@@ -29,6 +31,8 @@ export const WRAPS = [
   ["flames", "Flames"],
   ["checker", "Checker"],
 ] as const;
+/** All wraps: the classic paint layouts, then the graphic wraps from wraps.ts. */
+export const WRAPS = [...BASIC_WRAPS, ...FANCY_WRAPS] as const;
 export type WrapStyle = (typeof WRAPS)[number][0];
 
 export const FONTS = [

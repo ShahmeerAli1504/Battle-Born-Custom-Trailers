@@ -29,17 +29,20 @@ import {
   ROLE_LABEL,
   TEXT_FONTS,
   TOP,
-  WRAPS,
+  BASIC_WRAPS,
   type ColorKey,
   type CuisineKey,
   type ExteriorOption,
   type GadgetType,
   type PresetKey,
   type TextRole,
+  type WrapStyle,
 } from "@/lib/builder/constants";
-import { clampItem, decodeDesign, encodeDesign, isFree, itemW, mk, nextId, preset, syncIds, type Design, type Item } from "@/lib/builder/design";
-import { AXLE_LABEL, GADGET_ICONS, axles, layout, planData, renderScene, specList, viewBox, wrapThumb, type View } from "@/lib/builder/scene";
+import { clampItem, decodeDesign, emptyDesign, encodeDesign, isFree, itemW, mk, nextId, preset, syncIds, type Design, type Item } from "@/lib/builder/design";
+import { ALL_PICKS, STEP_ORDER, isComplete, progress, requirements, type Pick, type Requirement } from "@/lib/builder/steps";
+import { AXLE_LABEL, GADGET_ICONS, axles, layout, planData, renderEmptyStage, renderScene, specList, viewBox, wrapThumb, type View } from "@/lib/builder/scene";
 import { designToPng } from "@/lib/builder/export";
+import { FANCY_WRAPS } from "@/lib/builder/wraps";
 import { EstimateModal } from "./EstimateModal";
 
 type Tab = "style" | "gadgets" | "brand" | "kitchen";
@@ -50,6 +53,10 @@ const TABS: [Tab, string][] = [
   ["kitchen", "Kitchen"],
 ];
 type Box = { x: number; y: number; width: number; height: number };
+const WRAP_GROUPS: [string, readonly (readonly [WrapStyle, string])[]][] = [
+  ["Graphic wraps", FANCY_WRAPS],
+  ["Classic", BASIC_WRAPS],
+];
 type Drag = { id: string; dx: number; dy: number; moved: boolean };
 
 const ROLE_DEFAULTS: Record<TextRole, { y: number; size: number }> = {
@@ -59,7 +66,8 @@ const ROLE_DEFAULTS: Record<TextRole, { y: number; size: number }> = {
 };
 
 export function TrailerBuilder() {
-  const [design, setDesign] = useState<Design>(() => preset("tacos"));
+  const [design, setDesign] = useState<Design>(() => emptyDesign());
+  const [picked, setPicked] = useState<ReadonlySet<Pick>>(() => new Set());
   const [sel, setSel] = useState<string | null>(null);
   const [view, setViewState] = useState<View>("ext");
   const [night, setNight] = useState(false);
@@ -72,9 +80,11 @@ export function TrailerBuilder() {
 
   const history = useRef<string[]>([]);
   const designRef = useRef(design);
+  const pickedRef = useRef(picked);
   useLayoutEffect(() => {
     designRef.current = design;
-  }, [design]);
+    pickedRef.current = picked;
+  }, [design, picked]);
   const svgRef = useRef<SVGSVGElement>(null);
   const sceneRef = useRef<SVGGElement>(null);
   const drag = useRef<Drag | null>(null);
@@ -88,7 +98,7 @@ export function TrailerBuilder() {
   }, []);
 
   const snapshot = useCallback(() => {
-    history.current.push(JSON.stringify(designRef.current));
+    history.current.push(JSON.stringify({ d: designRef.current, p: [...pickedRef.current] }));
     if (history.current.length > 60) history.current.shift();
   }, []);
 
@@ -104,7 +114,9 @@ export function TrailerBuilder() {
   const undo = useCallback(() => {
     const prev = history.current.pop();
     if (!prev) return toast("Nothing to undo");
-    setDesign(JSON.parse(prev) as Design);
+    const snap = JSON.parse(prev) as { d: Design; p: Pick[] };
+    setDesign(snap.d);
+    setPicked(new Set(snap.p));
     setSel(null);
   }, [toast]);
 
@@ -113,11 +125,31 @@ export function TrailerBuilder() {
     setSel(null);
   }, []);
 
+  /** Record that the customer made a choice (used to unlock the next step). */
+  const markPicked = useCallback((...keys: Pick[]) => {
+    setPicked((prev) => (keys.every((k) => prev.has(k)) ? prev : new Set([...prev, ...keys])));
+  }, []);
+
+  const startOver = () => {
+    snapshot();
+    setDesign(emptyDesign());
+    setPicked(new Set());
+    setSel(null);
+    setTab("style");
+    setViewState("ext");
+  };
+
   const loadPreset = (k: PresetKey) => {
+    if (k === "blank") {
+      startOver();
+      toast("Started a blank trailer");
+      return;
+    }
     snapshot();
     setDesign(preset(k));
+    setPicked(new Set(ALL_PICKS));
     setSel(null);
-    toast("Template loaded");
+    toast("Template loaded — every step is filled in");
   };
 
   /* ---------------- boot: open a shared design from #d=… ---------------- */
@@ -128,6 +160,7 @@ export function TrailerBuilder() {
       if (d) {
         syncIds(d);
         setDesign(d);
+        setPicked(new Set(ALL_PICKS));
       } else toast("That design link couldn't be opened");
     } else if (window.location.hash === "#templates") {
       document.getElementById("templates")?.scrollIntoView({ block: "center" });
@@ -137,11 +170,14 @@ export function TrailerBuilder() {
   }, [toast]);
 
   /* ---------------- derived ---------------- */
-  const markup = useMemo(() => renderScene(design, view, night), [design, view, night]);
+  const started = picked.has("len");
+  const markup = useMemo(() => (started ? renderScene(design, view, night) : renderEmptyStage(night)), [design, view, night, started]);
   const vb = useMemo(() => viewBox(design, view), [design, view]);
   const pd = useMemo(() => planData(design), [design]);
   const specs = useMemo(() => specList(design), [design]);
   const selected = design.items.find((i) => i.id === sel) ?? null;
+  const prog = useMemo(() => progress(design, picked, pd), [design, picked, pd]);
+  const stepReqs = (t: Tab): Requirement[] => requirements(t, design, picked, pd);
 
   // Selection outline: measure the selected group after each render.
   useLayoutEffect(() => {
@@ -320,12 +356,33 @@ export function TrailerBuilder() {
   };
 
   const switchTab = (t: Tab) => {
+    const i = STEP_ORDER.indexOf(t);
+    if (!prog.unlocked[i]) {
+      toast(`Finish step ${STEP_ORDER.findIndex((_, k) => !prog.complete[k]) + 1} first`);
+      return;
+    }
     setTab(t);
     if (t === "kitchen") setView("plan");
     else if (view === "plan") setView("ext");
   };
 
   /* ---------------- render ---------------- */
+  // Wrap thumbnails preview the customer's own colors once they've picked them.
+  const thumbCols = picked.has("body") || picked.has("accent") ? { body: design.body, accent: design.accent, trim: design.trim } : undefined;
+
+  const bodyColorRows = (["body", "accent", "trim"] as const).map((k) => (
+    <ColorRow
+      key={k}
+      label={k}
+      colorKey={k}
+      value={design[k]}
+      active={picked.has(k)}
+      onPick={(c) => (change((d) => ({ ...d, [k]: c })), markPicked(k))}
+      onLive={(c) => (change((d) => ({ ...d, [k]: c }), false), markPicked(k))}
+      onFocus={snapshot}
+    />
+  ));
+
   const summary = (mobile: boolean) => (
     <div className="summary">
       <div className="summary-head">
@@ -339,32 +396,35 @@ export function TrailerBuilder() {
             <button
               type="button"
               className="btn btn-ghost btn-sm"
-              onClick={() => {
-                snapshot();
-                setDesign(preset("tacos"));
-                setSel(null);
-              }}
+              onClick={startOver}
             >
-              Reset
+              Start over
             </button>
           )}
         </div>
       </div>
       <div className="specs">
-        {specs.slice(0, 7).map(([k, v]) => (
+        {!started && <span className="spec">Your choices will show up here as you go.</span>}
+        {started && specs.slice(0, 7).map(([k, v]) => (
           <span key={k} className="spec">
             {k}: <b>{v.length > 60 ? `${v.slice(0, 58)}…` : v}</b>
           </span>
         ))}
       </div>
       <div className="actions">
-        <button type="button" className={clsx("btn btn-spark", mobile && "grow")} onClick={() => setModalOpen(true)}>
-          Send design for estimate {!mobile && <Icon name="arrow" strokeWidth={2.4} />}
+        <button
+          type="button"
+          className={clsx("btn btn-spark", mobile && "grow")}
+          disabled={!prog.allDone}
+          title={prog.allDone ? undefined : "Finish all 4 steps first"}
+          onClick={() => setModalOpen(true)}
+        >
+          {prog.allDone ? "Send design for estimate" : `Finish all 4 steps to send`} {!mobile && prog.allDone && <Icon name="arrow" strokeWidth={2.4} />}
         </button>
-        <button type="button" className="btn btn-ghost" onClick={download}>
+        <button type="button" className="btn btn-ghost" onClick={download} disabled={!started}>
           {mobile ? "Image" : "Download image"}
         </button>
-        <button type="button" className="btn btn-ghost" onClick={share}>
+        <button type="button" className="btn btn-ghost" onClick={share} disabled={!started}>
           {mobile ? "Link" : "Copy link"}
         </button>
       </div>
@@ -392,7 +452,7 @@ export function TrailerBuilder() {
           </div>
           <div className="steps" aria-hidden="true">
             {["Size & style", "Gadgets", "Branding", "Kitchen", "Send"].map((s, i) => (
-              <span key={s}>
+              <span key={s} className={clsx((i < 4 ? prog.complete[i] : false) && "done")}>
                 <b>{i + 1}</b>
                 {s}
               </span>
@@ -405,19 +465,33 @@ export function TrailerBuilder() {
         {/* ============ CONTROLS ============ */}
         <div className="panel">
           <div className="tabs" role="tablist" aria-label="Builder steps">
-            {TABS.map(([k, label], i) => (
-              <button key={k} type="button" role="tab" className="tab" id={`tab-${k}`} aria-controls={`pane-${k}`} aria-selected={tab === k} onClick={() => switchTab(k)}>
-                <b>{i + 1}</b>
-                {label}
-              </button>
-            ))}
+            {TABS.map(([k, label], i) => {
+              const locked = !prog.unlocked[i];
+              return (
+                <button
+                  key={k}
+                  type="button"
+                  role="tab"
+                  className={clsx("tab", locked && "locked", prog.complete[i] && "done")}
+                  id={`tab-${k}`}
+                  aria-controls={`pane-${k}`}
+                  aria-selected={tab === k}
+                  aria-disabled={locked}
+                  title={locked ? "Finish the previous step first" : undefined}
+                  onClick={() => switchTab(k)}
+                >
+                  <b>{locked ? <Icon name="lock" strokeWidth={2.4} /> : prog.complete[i] ? <Icon name="check" strokeWidth={3} /> : i + 1}</b>
+                  {label}
+                </button>
+              );
+            })}
           </div>
 
           {tab === "style" && (
             <div className="pane" role="tabpanel" id="pane-style" aria-labelledby="tab-style">
               <div className="group">
                 <div className="g-title">
-                  Trailer length <small>{AXLE_LABEL[axles(design.len)]}</small>
+                  Trailer length <small>{started ? AXLE_LABEL[axles(design.len)] : "Required"}</small>
                 </div>
                 <div className="len-grid">
                   {LENGTHS.map((l) => (
@@ -425,36 +499,21 @@ export function TrailerBuilder() {
                       key={l}
                       type="button"
                       className="len"
-                      aria-pressed={design.len === l}
-                      onClick={() =>
-                        change((d) => {
-                          const next: Design = { ...d, len: l, items: d.items.map((i) => ({ ...i, x: (i.x * l) / d.len })) };
-                          return next;
-                        })
-                      }
+                      aria-pressed={started && design.len === l}
+                      onClick={() => {
+                        change((d) => ({ ...d, len: l, items: d.items.map((i) => ({ ...i, x: (i.x * l) / d.len })) }));
+                        markPicked("len");
+                      }}
                     >
                       {l}&apos;<small>{["", "1 axle", "2 axles", "3 axles"][axles(l)]}</small>
-                      {pd.rec === l && <span className="rec">FITS</span>}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="group">
-                <div className="g-title">Wrap style</div>
-                <div className="wrap-grid">
-                  {WRAPS.map(([k, n]) => (
-                    <button key={k} type="button" className="wrapopt" aria-pressed={design.wrap === k} onClick={() => change((d) => ({ ...d, wrap: k }))}>
-                      <svg viewBox="0 0 80 48" aria-hidden="true" dangerouslySetInnerHTML={{ __html: wrapThumb(k) }} />
-                      {n}
+                      {design.equip.length > 0 && pd.rec === l && <span className="rec">FITS</span>}
                     </button>
                   ))}
                 </div>
               </div>
               <div className="group">
                 <div className="g-title">Colors</div>
-                {(["body", "accent", "trim"] as const).map((k) => (
-                  <ColorRow key={k} label={k} colorKey={k} value={design[k]} onPick={(c) => change((d) => ({ ...d, [k]: c }))} onLive={(c) => change((d) => ({ ...d, [k]: c }), false)} onFocus={snapshot} />
-                ))}
+                {bodyColorRows}
               </div>
               {(["exterior", "tongue"] as const).map((grp) => (
                 <div className="group" key={grp}>
@@ -538,9 +597,9 @@ export function TrailerBuilder() {
                       key={f}
                       type="button"
                       className="fontopt"
-                      aria-pressed={design.font === f}
+                      aria-pressed={picked.has("font") && design.font === f}
                       style={{ fontFamily: `'${f}', sans-serif`, ...(f === "Big Shoulders Display" ? { fontWeight: 800, textTransform: "uppercase" } : {}) }}
-                      onClick={() => change((d) => ({ ...d, font: f }))}
+                      onClick={() => (change((d) => ({ ...d, font: f })), markPicked("font"))}
                     >
                       {n}
                     </button>
@@ -566,10 +625,44 @@ export function TrailerBuilder() {
                   label="Text"
                   colorKey="text"
                   value={design.text}
-                  onPick={(c) => change((d) => ({ ...d, text: c, items: d.items.map((i) => (i.role ? { ...i, color: undefined } : i)) }))}
-                  onLive={(c) => change((d) => ({ ...d, text: c }), false)}
+                  active={picked.has("text")}
+                  onPick={(c) => (change((d) => ({ ...d, text: c, items: d.items.map((i) => (i.role ? { ...i, color: undefined } : i)) })), markPicked("text"))}
+                  onLive={(c) => (change((d) => ({ ...d, text: c }), false), markPicked("text"))}
                   onFocus={snapshot}
                 />
+              </div>
+              <div className="group">
+                <div className="g-title">
+                  Wrap colors <small>shared with step 1 — the wraps below preview them</small>
+                </div>
+                {bodyColorRows}
+              </div>
+              <div className="group">
+                <div className="g-title">
+                  Wrap design
+                </div>
+                {WRAP_GROUPS.map(([title, list]) => (
+                  <div key={title} className="wrap-set">
+                    <div className="wrap-sub">
+                      {title}
+                      {title === "Graphic wraps" && <span className="new">New</span>}
+                    </div>
+                    <div className="wrap-grid">
+                      {list.map(([k, n]) => (
+                        <button
+                          key={k}
+                          type="button"
+                          className="wrapopt"
+                          aria-pressed={picked.has("wrap") && design.wrap === k}
+                          onClick={() => (change((d) => ({ ...d, wrap: k })), markPicked("wrap"))}
+                        >
+                          <svg viewBox="0 0 80 48" aria-hidden="true" dangerouslySetInnerHTML={{ __html: wrapThumb(k, thumbCols) }} />
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
               <div className="group">
                 <label className="f" htmlFor="bSign">
@@ -591,7 +684,7 @@ export function TrailerBuilder() {
                       key={k}
                       type="button"
                       className="cz"
-                      aria-pressed={design.cuisine === k}
+                      aria-pressed={picked.has("cuisine") && design.cuisine === k}
                       onClick={() => {
                         change((d) => {
                           const oldSign = CUISINES[d.cuisine].sign;
@@ -603,6 +696,7 @@ export function TrailerBuilder() {
                             smoker: k === "bbq" ? true : d.smoker,
                           };
                         });
+                        markPicked("cuisine");
                         toast(`${CUISINES[k].n} setup loaded`);
                       }}
                     >
@@ -639,6 +733,18 @@ export function TrailerBuilder() {
               </div>
             </div>
           )}
+
+          <StepFooter
+            step={TABS.findIndex(([k]) => k === tab)}
+            reqs={stepReqs(tab)}
+            allDone={prog.allDone}
+            onNext={() => {
+              const i = TABS.findIndex(([k]) => k === tab);
+              const next = TABS[i + 1];
+              if (next) switchTab(next[0]);
+              else setModalOpen(true);
+            }}
+          />
         </div>
 
         {/* ============ STAGE ============ */}
@@ -655,7 +761,7 @@ export function TrailerBuilder() {
             onDrop={onDrop}
           >
             <div className="stage-bar">
-              <div className="seg" role="group" aria-label="View">
+              <div className={clsx("seg", !started && "off")} role="group" aria-label="View">
                 <button type="button" aria-pressed={view === "ext"} onClick={() => setView("ext")}>
                   Outside
                 </button>
@@ -663,7 +769,7 @@ export function TrailerBuilder() {
                   Floor plan
                 </button>
               </div>
-              <div className="seg" role="group" aria-label="Lighting">
+              <div className={clsx("seg", !started && "off")} role="group" aria-label="Lighting">
                 <button type="button" aria-pressed={!night} onClick={() => setNight(false)}>
                   <Icon name="sun" strokeWidth={2.2} />
                   Day
@@ -703,6 +809,13 @@ export function TrailerBuilder() {
               )}
             </svg>
 
+            {!started && (
+              <div className="stage-empty">
+                <b>Your trailer will appear here</b>
+                <span>Start with step 1 — choose a trailer length.</span>
+              </div>
+            )}
+
             {selected && view === "ext" ? (
               <Inspector
                 key={selected.id}
@@ -716,11 +829,11 @@ export function TrailerBuilder() {
                 onDone={() => setSel(null)}
               />
             ) : (
-              view === "ext" && <div className="tip">Drag pieces to move them · click to edit</div>
+              view === "ext" && started && <div className="tip">Drag pieces to move them · click to edit</div>
             )}
           </div>
 
-          <div className="panel">
+          <div className="panel" hidden={design.equip.length === 0 && tab !== "kitchen"}>
             <div className="fit">
               {(["b", "f"] as const).map((k) => {
                 const over = pd.used[k] > pd.avail[k];
@@ -767,6 +880,7 @@ function ColorRow({
   label,
   colorKey,
   value,
+  active,
   onPick,
   onLive,
   onFocus,
@@ -774,6 +888,7 @@ function ColorRow({
   label: string;
   colorKey: ColorKey;
   value: string;
+  active: boolean;
   onPick: (c: string) => void;
   onLive: (c: string) => void;
   onFocus: () => void;
@@ -783,7 +898,7 @@ function ColorRow({
       <span className="capitalize">{label}</span>
       <div className="swatches">
         {COLORS[colorKey].map((c) => (
-          <button key={c} type="button" className="sw" style={{ background: c }} aria-label={`${label} ${c}`} aria-pressed={c.toLowerCase() === value.toLowerCase()} onClick={() => onPick(c)} />
+          <button key={c} type="button" className="sw" style={{ background: c }} aria-label={`${label} ${c}`} aria-pressed={active && c.toLowerCase() === value.toLowerCase()} onClick={() => onPick(c)} />
         ))}
         <label className="picker" title="Custom color">
           <input type="color" value={value} onFocus={onFocus} onChange={(e) => onLive(e.target.value)} aria-label={`Custom ${label} color`} />
@@ -854,6 +969,34 @@ function Inspector({
       </button>
       <button type="button" className="ibtn" onClick={onDone}>
         Done
+      </button>
+    </div>
+  );
+}
+
+/* ---------------- step checklist + Next ---------------- */
+const NEXT_LABEL = ["Next: Gadgets", "Next: Branding", "Next: Kitchen", "Review & send"];
+
+function StepFooter({ step, reqs, allDone, onNext }: { step: number; reqs: Requirement[]; allDone: boolean; onNext: () => void }) {
+  const done = isComplete(reqs);
+  const left = reqs.filter((r) => !r.done).length;
+  const last = step === NEXT_LABEL.length - 1;
+  return (
+    <div className="step-foot">
+      <ul className="reqs" aria-label={`Step ${step + 1} checklist`}>
+        {reqs.map((r) => (
+          <li key={r.label} className={clsx(r.done && "ok")}>
+            <span className="tick" aria-hidden="true">
+              {r.done ? <Icon name="check" strokeWidth={3} /> : null}
+            </span>
+            {r.label}
+            <span className="sr-only">{r.done ? " — done" : " — to do"}</span>
+          </li>
+        ))}
+      </ul>
+      <button type="button" className="btn btn-spark next" disabled={!done || (last && !allDone)} onClick={onNext}>
+        {done ? NEXT_LABEL[step] : `${left} ${left === 1 ? "item" : "items"} left`}
+        {done && <Icon name="arrow" strokeWidth={2.4} />}
       </button>
     </div>
   );
