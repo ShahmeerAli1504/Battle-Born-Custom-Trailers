@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { Icon } from "@/components/ui/Icon";
 import { QuoteForm } from "@/components/forms/QuoteForm";
 import { PageHero } from "@/components/sections/Sections";
 import { instagramUrl, site } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Contact & Free Quote",
-  description: "Request a free quote for a custom food trailer. Call David (775-200-4169) or Oliver (775-203-2833), or send us your project details. Hablamos Español.",
-  alternates: { canonical: "/contact" },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Contact Us & Get a Free Food Trailer Quote",
+  description: "Request a free quote for a custom food trailer in Nevada. Call David (775-200-4169) or Oliver (775-203-2833), or send your project details online. Hablamos Español.",
+  path: "/contact",
+  keywords: ["food trailer quote", "custom food trailer price", "food truck builder near me"],
+});
 
 const EXPECT = ["Free consultation, no pressure", "Detailed quote with no hidden fees", "Licensed & insured builds", "Hablamos Español"];
 
@@ -17,6 +19,7 @@ export default function ContactPage() {
     <>
       <PageHero
         crumb="Contact"
+        path="/contact"
         eyebrow="Free consultation"
         title="Let's build your trailer"
         lede="Tell us about your concept and we'll get back to you with next steps. Free consultations • Transparent pricing • Licensed & insured."

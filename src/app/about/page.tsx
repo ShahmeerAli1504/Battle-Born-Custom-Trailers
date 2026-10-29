@@ -1,21 +1,24 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { Icon } from "@/components/ui/Icon";
 import { SoundVideo } from "@/components/media/Videos";
 import { CtaBand, PageHero, SectionHead } from "@/components/sections/Sections";
 import { instagramUrl, site } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "About",
-  description: "Battle Born Custom Trailers was founded by David and Oliver Mendoza to build custom food trailers — and to help people become business owners.",
-  alternates: { canonical: "/about" },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "About Us — Meet David & Oliver Mendoza",
+  description: "Battle Born Custom Trailers was founded in Nevada by David and Oliver Mendoza to build custom food trailers — and to help entrepreneurs become business owners. Hablamos Español.",
+  path: "/about",
+  image: { url: "/assets/video/one-year.jpg", alt: "About Us — Meet David & Oliver Mendoza — Battle Born Custom Trailers" },
+});
 
 export default function AboutPage() {
   return (
     <>
       <PageHero
         crumb="About"
+        path="/about"
         eyebrow="Our story"
         title="A dream between partners"
         lede="Battle Born Custom Trailers was founded by David and Oliver Mendoza to build custom food trailers — and to help people become business owners."

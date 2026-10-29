@@ -502,7 +502,7 @@
   .footer-brand img { width: 120px; height: auto; border-radius: 14px; margin-bottom: 18px; }
   .footer-brand p { color: var(--steel-dim); max-width: 34ch; }
   .footer-brand .proud { font-family: var(--f-label); letter-spacing: 0.18em; text-transform: uppercase; color: var(--spark); font-size: 0.85rem; font-weight: 600; }
-  .site-footer h4 { font-family: var(--f-label); font-size: 0.95rem; letter-spacing: 0.2em; color: var(--white); margin-bottom: 18px; font-weight: 700; }
+  .site-footer h4, .site-footer .footer-heading { font-family: var(--f-label); font-size: 0.95rem; letter-spacing: 0.2em; color: var(--white); margin-bottom: 18px; font-weight: 700; }
   .site-footer ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
   .site-footer ul a { color: var(--steel-dim); transition: color 0.2s; }
   .site-footer ul a:hover { color: var(--white); }

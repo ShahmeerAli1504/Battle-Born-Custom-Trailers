@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { CtaBand, FeatureCards, PageHero, SectionHead } from "@/components/sections/Sections";
 import { BEYOND, PROCESS, SERVICES, WHY_US } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Services",
-  description: "Custom food trailers, structural reinforcement, fabrication & welding, wraps & branding, permits and business consulting — everything to launch a mobile food business.",
-  alternates: { canonical: "/services" },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Food Trailer Building, Fabrication & Wrap Services",
+  description: "Custom food trailers, structural reinforcement, fabrication & welding, wraps & branding, permits and business consulting in Nevada — everything to launch a mobile food business.",
+  path: "/services",
+  keywords: ["food trailer fabrication", "trailer welding Reno", "food truck wraps", "food truck permits Nevada", "food truck business consulting"],
+});
 
 export default function ServicesPage() {
   return (
     <>
       <PageHero
         crumb="Services"
+        path="/services"
         eyebrow="Complete solutions"
         title="Everything your mobile business needs"
         lede="From custom builds to ongoing support, we provide everything you need to launch and grow a successful food truck business."

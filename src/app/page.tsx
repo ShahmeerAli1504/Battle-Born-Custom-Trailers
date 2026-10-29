@@ -11,34 +11,20 @@ import { SoundVideo } from "@/components/media/Videos";
 import { CtaBand, FeatureCards, SectionHead } from "@/components/sections/Sections";
 import { BUILDS, INTERIORS, MENDOZA_SPECS, PILLARS, SERVICES } from "@/lib/content";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-};
+export const metadata: Metadata = pageMetadata({
+  title: `${site.name} | ${site.tagline}`,
+  absoluteTitle: true,
+  description: site.description,
+  path: "/",
+});
 
 const MARQUEE = ["Custom Food Trailers", "Mobile Kitchens", "Fabrication & Welding", "Custom Wraps", "Permits & Compliance", "Hablamos Español"];
-
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  name: site.name,
-  description: site.description,
-  url: site.url,
-  email: site.email,
-  telephone: site.people[0].tel,
-  image: `${site.url}/assets/img/og.jpg`,
-  logo: `${site.url}/assets/img/logo.jpg`,
-  areaServed: { "@type": "State", name: "Nevada" },
-  knowsLanguage: ["en", "es"],
-  founder: site.people.map((p) => ({ "@type": "Person", name: p.name, jobTitle: p.role })),
-  sameAs: site.people.map((p) => `https://www.instagram.com/${p.instagram}/`),
-};
 
 export default function HomePage() {
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-
       <section className="hero">
         <Sparks />
         <div className="wrap hero-grid">

@@ -3,10 +3,12 @@ import type { ReactNode } from "react";
 import { Icon } from "@/components/ui/Icon";
 import type { Feature } from "@/lib/content";
 import { primaryPhone } from "@/lib/site";
+import { breadcrumbJsonLd, jsonLdString } from "@/lib/seo";
 
-export function PageHero({ crumb, eyebrow, title, lede }: { crumb: string; eyebrow: string; title: string; lede: ReactNode }) {
+export function PageHero({ crumb, path, eyebrow, title, lede }: { crumb: string; path?: string; eyebrow: string; title: string; lede: ReactNode }) {
   return (
     <section className="page-hero">
+      {path && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbJsonLd(crumb, path)) }} />}
       <div className="wrap">
         <nav className="crumbs" aria-label="Breadcrumb">
           <Link href="/">Home</Link> / {crumb}

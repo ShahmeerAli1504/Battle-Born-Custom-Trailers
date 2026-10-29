@@ -1,19 +1,23 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { InteriorGallery } from "@/components/gallery/InteriorGallery";
 import { CtaBand, FeatureCards, PageHero } from "@/components/sections/Sections";
 import { INSIDE, INTERIORS } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Interiors",
-  description: "Commercial-grade food trailer kitchens: stainless workstations, refrigeration, triple-basin sinks, hoods and fire suppression — built to pass inspection.",
-  alternates: { canonical: "/interiors" },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Commercial Food Trailer Kitchens & Interiors",
+  description: "Commercial-grade food trailer kitchens built in Nevada: stainless workstations, refrigeration, triple-basin sinks, hoods and fire suppression — built to pass health inspection.",
+  path: "/interiors",
+  image: { url: "/assets/img/interiors/full-kitchen.jpg", alt: "Commercial Food Trailer Kitchens & Interiors — Battle Born Custom Trailers" },
+  keywords: ["food trailer kitchen", "commercial mobile kitchen", "food truck interior", "NSF food trailer equipment"],
+});
 
 export default function InteriorsPage() {
   return (
     <>
       <PageHero
         crumb="Interiors"
+        path="/interiors"
         eyebrow="Step inside excellence"
         title="Kitchens built to work"
         lede="Every inch of your trailer is designed with precision, efficiency, and durability in mind. Explore real projects built for chefs, entrepreneurs, and mobile business owners."

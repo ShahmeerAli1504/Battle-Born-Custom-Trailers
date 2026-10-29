@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { BuildsGallery } from "@/components/gallery/BuildsGallery";
 import { Spotlight } from "@/components/gallery/Spotlight";
 import { VideoReels } from "@/components/media/Videos";
 import { CtaBand, PageHero, SectionHead } from "@/components/sections/Sections";
 import { BUILDS, MENDOZA_SPECS, VIDEOS } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Completed Builds",
-  description: "Browse custom food trailers built by Battle Born Custom Trailers — custom wraps, clean builds, the Mendoza's double-deck flagship and video build tours.",
-  alternates: { canonical: "/builds" },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Custom Food Trailer Builds & Gallery",
+  description: "Browse completed custom food trailers by Battle Born Custom Trailers in Nevada — custom wraps, clean builds, the Mendoza's double-deck flagship and video build tours.",
+  path: "/builds",
+  image: { url: "/assets/img/builds/mendozas-food-truck.jpg", alt: "Custom Food Trailer Builds & Gallery — Battle Born Custom Trailers" },
+  keywords: ["food trailer gallery", "custom food trailer builds", "food truck wraps Nevada", "double deck food trailer"],
+});
 
 export default function BuildsPage() {
   return (
     <>
       <PageHero
         crumb="Builds"
+        path="/builds"
         eyebrow="Our work"
         title="Completed builds"
         lede="Every trailer tells a story of an entrepreneur taking control of their future. Browse the builds — tap any photo to see it full size."

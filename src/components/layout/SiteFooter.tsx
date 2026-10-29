@@ -31,7 +31,7 @@ export function SiteFooter() {
             <div className="proud">Licensed • Insured • Nevada Proud</div>
           </div>
           <div>
-            <h4>Services</h4>
+            <h2 className="footer-heading">Services</h2>
             <ul>
               {services.map((l) => (
                 <li key={l.href}>
@@ -41,7 +41,7 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <h4>Explore</h4>
+            <h2 className="footer-heading">Explore</h2>
             <ul>
               {explore.map((l) => (
                 <li key={l.href}>
@@ -51,7 +51,7 @@ export function SiteFooter() {
             </ul>
           </div>
           <div>
-            <h4>Get in touch</h4>
+            <h2 className="footer-heading">Get in touch</h2>
             <ul>
               {site.people.map((p) => (
                 <li key={p.tel}>
