@@ -15,9 +15,9 @@ import {
   COLORS,
   CUISINES,
   CUISINE_KEYS,
-  EMOJI,
   EQUIP,
-  EQUIP_KEYS,
+  EQUIP_GROUPS,
+  MAX_QTY,
   EXTERIOR_OPTIONS,
   FONTS,
   GADGETS,
@@ -29,20 +29,18 @@ import {
   ROLE_LABEL,
   TEXT_FONTS,
   TOP,
-  BASIC_WRAPS,
+  WRAPS,
   type ColorKey,
   type CuisineKey,
   type ExteriorOption,
   type GadgetType,
   type PresetKey,
   type TextRole,
-  type WrapStyle,
 } from "@/lib/builder/constants";
 import { clampItem, decodeDesign, emptyDesign, encodeDesign, isFree, itemW, mk, nextId, preset, syncIds, type Design, type Item } from "@/lib/builder/design";
 import { ALL_PICKS, STEP_ORDER, isComplete, progress, requirements, type Pick, type Requirement } from "@/lib/builder/steps";
 import { AXLE_LABEL, GADGET_ICONS, axles, layout, planData, renderEmptyStage, renderScene, specList, viewBox, wrapThumb, type View } from "@/lib/builder/scene";
 import { designToPng } from "@/lib/builder/export";
-import { FANCY_WRAPS } from "@/lib/builder/wraps";
 import { EstimateModal } from "./EstimateModal";
 
 type Tab = "style" | "gadgets" | "brand" | "kitchen";
@@ -53,10 +51,6 @@ const TABS: [Tab, string][] = [
   ["kitchen", "Kitchen"],
 ];
 type Box = { x: number; y: number; width: number; height: number };
-const WRAP_GROUPS: [string, readonly (readonly [WrapStyle, string])[]][] = [
-  ["Graphic wraps", FANCY_WRAPS],
-  ["Classic", BASIC_WRAPS],
-];
 type Drag = { id: string; dx: number; dy: number; moved: boolean };
 
 const ROLE_DEFAULTS: Record<TextRole, { y: number; size: number }> = {
@@ -214,14 +208,13 @@ export function TrailerBuilder() {
     setSel(c.id);
   };
 
-  const addItem = (type: GadgetType, opts: { x?: number; y?: number; emoji?: string } = {}) => {
+  const addItem = (type: GadgetType, opts: { x?: number; y?: number } = {}) => {
     const d = designRef.current;
     const L = d.len, w = type === "sign" ? 6 : (GADGETS[type]?.w ?? 2);
     let x = opts.x ?? L / 2;
     x = isFree(type) ? Math.max(0.5, Math.min(L - 0.5, x)) : Math.max(w / 2, Math.min(L - w / 2, x));
     const it = mk(type, x);
     if (type === "text") Object.assign(it, { y: opts.y ?? TOP + 120, text: "Your text", size: 30, color: d.text });
-    if (type === "decal") Object.assign(it, { y: opts.y ?? TOP + 110, emoji: opts.emoji || "⭐", size: 60 });
     change((dd) => ({
       ...dd,
       signText: type === "sign" && !dd.signText ? CUISINES[dd.cuisine].sign : dd.signText,
@@ -229,7 +222,7 @@ export function TrailerBuilder() {
     }));
     if (view !== "ext") setViewState("ext");
     setSel(it.id);
-    toast(`${opts.emoji || GADGETS[type].n} added — drag to place`);
+    toast(`${GADGETS[type].n} added — drag to place`);
   };
 
   /** Typing a business name / tagline / phone adds its text block back if it was deleted. */
@@ -292,7 +285,7 @@ export function TrailerBuilder() {
   const onDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDropHover(false);
-    let data: { type: GadgetType; emoji?: string };
+    let data: { type: GadgetType };
     try {
       data = JSON.parse(e.dataTransfer.getData("text/plain"));
     } catch {
@@ -301,7 +294,7 @@ export function TrailerBuilder() {
     if (!data?.type || !(data.type in GADGETS)) return;
     if (view !== "ext") setViewState("ext");
     const p = svgPoint(e.clientX, e.clientY);
-    addItem(data.type, { x: (p.x - layout(designRef.current).bx) / PPF, y: Math.max(TOP + 20, Math.min(BOT - 12, p.y)), emoji: data.emoji });
+    addItem(data.type, { x: (p.x - layout(designRef.current).bx) / PPF, y: Math.max(TOP + 20, Math.min(BOT - 12, p.y)) });
   };
 
   /* ---------------- keyboard ---------------- */
@@ -555,29 +548,6 @@ export function TrailerBuilder() {
                   ))}
                 </div>
               </div>
-              <div className="group">
-                <div className="g-title">
-                  Food decals <small>drag or tap</small>
-                </div>
-                <div className="emojis">
-                  {EMOJI.map((em) => (
-                    <button
-                      key={em}
-                      type="button"
-                      className="emo"
-                      draggable
-                      aria-label={`Add ${em} decal`}
-                      onDragStart={(e) => {
-                        e.dataTransfer.setData("text/plain", JSON.stringify({ type: "decal", emoji: em }));
-                        e.dataTransfer.effectAllowed = "copy";
-                      }}
-                      onClick={() => addItem("decal", { emoji: em })}
-                    >
-                      {em}
-                    </button>
-                  ))}
-                </div>
-              </div>
             </div>
           )}
 
@@ -633,36 +603,29 @@ export function TrailerBuilder() {
               </div>
               <div className="group">
                 <div className="g-title">
-                  Wrap colors <small>shared with step 1 — the wraps below preview them</small>
+                  Trailer colors <small>shared with step 1</small>
                 </div>
                 {bodyColorRows}
               </div>
               <div className="group">
                 <div className="g-title">
-                  Wrap design
+                  Wrap <small>every wrap is custom artwork, designed with you</small>
                 </div>
-                {WRAP_GROUPS.map(([title, list]) => (
-                  <div key={title} className="wrap-set">
-                    <div className="wrap-sub">
-                      {title}
-                      {title === "Graphic wraps" && <span className="new">New</span>}
-                    </div>
-                    <div className="wrap-grid">
-                      {list.map(([k, n]) => (
-                        <button
-                          key={k}
-                          type="button"
-                          className="wrapopt"
-                          aria-pressed={picked.has("wrap") && design.wrap === k}
-                          onClick={() => (change((d) => ({ ...d, wrap: k })), markPicked("wrap"))}
-                        >
-                          <svg viewBox="0 0 80 48" aria-hidden="true" dangerouslySetInnerHTML={{ __html: wrapThumb(k, thumbCols) }} />
-                          {n}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                <div className="wrap-choice">
+                  {WRAPS.map(([k, n]) => (
+                    <button
+                      key={k}
+                      type="button"
+                      className="wrapopt"
+                      aria-pressed={picked.has("wrap") && design.wrap === k}
+                      onClick={() => (change((d) => ({ ...d, wrap: k })), markPicked("wrap"))}
+                    >
+                      <svg viewBox="0 0 80 48" aria-hidden="true" dangerouslySetInnerHTML={{ __html: wrapThumb(k, thumbCols) }} />
+                      <b>{n}</b>
+                      <small>{k === "full" ? "Edge-to-edge printed wrap. Our team designs the artwork with you." : "Solid paint in your body color."}</small>
+                    </button>
+                  ))}
+                </div>
               </div>
               <div className="group">
                 <label className="f" htmlFor="bSign">
@@ -709,27 +672,49 @@ export function TrailerBuilder() {
               </div>
               <div className="group">
                 <div className="g-title">
-                  Equipment <small>width along the wall</small>
+                  Equipment <small>add as many as you need</small>
                 </div>
-                <div className="equip">
-                  {EQUIP_KEYS.map((k) => (
-                    <label key={k} className="eq">
-                      <input
-                        type="checkbox"
-                        checked={design.equip.includes(k)}
-                        onChange={(e) => {
-                          const on = e.target.checked;
-                          change((d) => ({ ...d, equip: on ? (d.equip.includes(k) ? d.equip : [...d.equip, k]) : d.equip.filter((x) => x !== k) }));
-                        }}
-                      />
-                      <span>
-                        {EQUIP[k].n}
-                        {EQUIP[k].req && <span className="req">Required</span>}
-                      </span>
-                      <small>{EQUIP[k].w} ft</small>
-                    </label>
-                  ))}
-                </div>
+                {EQUIP_GROUPS.map((g) => (
+                  <div key={g.title} className="eq-group">
+                    <div className="eq-head">
+                      {g.title}
+                      {g.note && <small>{g.note}</small>}
+                    </div>
+                    <div className="equip">
+                      {g.keys.map((k) => {
+                        const qty = design.equip.filter((x) => x === k).length;
+                        return (
+                          <div key={k} className={clsx("eq", qty > 0 && "on")}>
+                            <span>
+                              {EQUIP[k].n}
+                              {EQUIP[k].req && <span className="req">Required</span>}
+                              <small>{EQUIP[k].w} ft wide</small>
+                            </span>
+                            <div className="qty" role="group" aria-label={`${EQUIP[k].n} quantity`}>
+                              <button
+                                type="button"
+                                aria-label={`Remove one ${EQUIP[k].n}`}
+                                disabled={qty === 0}
+                                onClick={() =>
+                                  change((d) => {
+                                    const at = d.equip.lastIndexOf(k);
+                                    return at < 0 ? d : { ...d, equip: d.equip.filter((_, n) => n !== at) };
+                                  })
+                                }
+                              >
+                                −
+                              </button>
+                              <output aria-live="polite">{qty}</output>
+                              <button type="button" aria-label={`Add one ${EQUIP[k].n}`} disabled={qty >= MAX_QTY} onClick={() => change((d) => ({ ...d, equip: [...d.equip, k] }))}>
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -953,9 +938,6 @@ function Inspector({
           <input type="color" title="Color" aria-label="Text color" value={item.color || design.text} onChange={(e) => onChange({ color: e.target.value })} />
           <input type="range" title="Size" aria-label="Text size" min={12} max={90} value={item.size || 28} onChange={(e) => onChange({ size: Number(e.target.value) })} />
         </>
-      )}
-      {item.type === "decal" && (
-        <input type="range" title="Size" aria-label="Decal size" min={28} max={140} value={item.size || 56} onChange={(e) => onChange({ size: Number(e.target.value) })} />
       )}
       {item.type === "sign" && <input type="text" maxLength={16} aria-label="Sign text" value={design.signText} onChange={(e) => onBrand("signText", e.target.value)} />}
       <span className="ispace" />

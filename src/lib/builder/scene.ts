@@ -3,7 +3,7 @@
 
 import { ASPECT, BOT, CUISINES, EQUIP, GROUND, H, LENGTHS, PPF, SCENE_H, TOP, W, WRAPS, type EquipKey, type WrapStyle } from "./constants";
 import { itemW, type Design, type Item } from "./design";
-import { drawFancyWrap, isFancyWrap } from "./wraps";
+import { drawFullWrap } from "./wraps";
 
 export type View = "ext" | "plan";
 
@@ -115,15 +115,6 @@ function drawItem(d: Design, it: Item, g: Layout, night: boolean): string {
       s += `<rect x="${x}" y="${y + h - 40}" width="${w}" height="40" fill="url(#plate)" opacity=".9"/>`;
       break;
     }
-    case "menu": {
-      const y = TOP + 60, h = 124;
-      s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="#1b1f26" stroke="${d.trim}" stroke-width="4"/>`;
-      s += `<text x="${cx}" y="${y + 22}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="15" fill="${acc === "#111317" ? "#f2b705" : acc}" letter-spacing="2">MENU</text>`;
-      for (let i = 0; i < 6; i++) {
-        s += `<rect x="${x + 10}" y="${y + 36 + i * 13}" width="${w * 0.5}" height="4" rx="2" fill="#e8ecf2" opacity=".75"/><rect x="${x + w - 26}" y="${y + 36 + i * 13}" width="16" height="4" rx="2" fill="#e8ecf2" opacity=".75"/>`;
-      }
-      break;
-    }
     case "tv": {
       const y = TOP + 40, h = 66;
       s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="#0b0d11" stroke="#2a2f38" stroke-width="3"/>`;
@@ -136,13 +127,6 @@ function drawItem(d: Design, it: Item, g: Layout, night: boolean): string {
       const y = TOP + 14, h = 56;
       s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="5" fill="#e9edf2" stroke="#9aa4b0" stroke-width="2"/>`;
       for (let i = 0; i < 6; i++) s += `<rect x="${x + 8}" y="${y + 9 + i * 7}" width="${w - 16}" height="3" rx="1" fill="#9aa4b0"/>`;
-      break;
-    }
-    case "vent": {
-      const y = TOP - 46;
-      s += `<rect x="${x + w * 0.15}" y="${y + 16}" width="${w * 0.7}" height="30" fill="url(#steel)" stroke="#6d7684"/>`;
-      s += `<path d="M${x} ${y + 18} Q${cx} ${y - 10} ${x + w} ${y + 18} Z" fill="url(#steel)" stroke="#6d7684"/>`;
-      for (let i = 1; i < 5; i++) s += `<line x1="${x + w * 0.15}" y1="${y + 16 + i * 6}" x2="${x + w * 0.85}" y2="${y + 16 + i * 6}" stroke="#6d7684" stroke-width="1.5"/>`;
       break;
     }
     case "sign": {
@@ -171,46 +155,13 @@ function drawItem(d: Design, it: Item, g: Layout, night: boolean): string {
       s += `<text x="${cx}" y="${it.y}" text-anchor="middle" font-family="${esc(font)},sans-serif" font-weight="${fw}" font-size="${size}" fill="${col}" stroke="${stroke}" stroke-width="${size > 30 ? 4 : 2.5}" paint-order="stroke" stroke-linejoin="round" ${caps ? 'letter-spacing="1.5"' : ""}>${esc(caps ? txt.toUpperCase() : txt)}</text>`;
       break;
     }
-    case "decal": {
-      s += `<text x="${cx}" y="${it.y}" text-anchor="middle" dominant-baseline="central" font-size="${it.size || 56}">${esc(it.emoji || "⭐")}</text>`;
-      break;
-    }
   }
   return `<g class="it" data-id="${esc(it.id)}">${s}</g>`;
 }
 
 /* ---------------- exterior ---------------- */
 function wrapLayer(d: Design, g: Layout): string {
-  const { bx, bw } = g, a = d.accent;
-  switch (d.wrap) {
-    case "twotone":
-      return `<rect x="${bx}" y="${TOP + H * 0.56}" width="${bw}" height="${H}" fill="${a}"/><rect x="${bx}" y="${TOP + H * 0.56 - 7}" width="${bw}" height="7" fill="${d.trim}"/>`;
-    case "stripe":
-      return `<rect x="${bx}" y="${TOP + H * 0.6}" width="${bw}" height="38" fill="${a}"/><rect x="${bx}" y="${TOP + H * 0.6 - 10}" width="${bw}" height="4" fill="${a}"/><rect x="${bx}" y="${TOP + H * 0.6 + 44}" width="${bw}" height="4" fill="${a}"/>`;
-    case "swoosh":
-      return `<path d="M${bx} ${BOT} L${bx} ${BOT - 70} C${bx + bw * 0.35} ${BOT - 40} ${bx + bw * 0.6} ${TOP + 90} ${bx + bw} ${TOP + 40} L${bx + bw} ${BOT} Z" fill="${a}"/><path d="M${bx} ${BOT - 70} C${bx + bw * 0.35} ${BOT - 40} ${bx + bw * 0.6} ${TOP + 90} ${bx + bw} ${TOP + 40}" fill="none" stroke="${d.trim}" stroke-width="8"/>`;
-    case "flames": {
-      const step = 56;
-      const flameH = (i: number) => 80 + ((i * 37) % 70) + (i % 3 === 0 ? 40 : 0);
-      let p1 = `M${bx} ${BOT}`;
-      for (let x = bx, i = 0; x < bx + bw; x += step, i++) {
-        const h = flameH(i);
-        p1 += ` Q${x + step * 0.15} ${BOT - h * 0.5} ${x + step * 0.5} ${BOT - h} Q${x + step * 0.55} ${BOT - h * 0.45} ${x + step} ${BOT - 20}`;
-      }
-      p1 += ` L${bx + bw} ${BOT} Z`;
-      let p2 = `M${bx} ${BOT}`;
-      for (let x = bx, i = 0; x < bx + bw; x += step, i++) {
-        const h = flameH(i) * 0.55;
-        p2 += ` Q${x + step * 0.2} ${BOT - h * 0.5} ${x + step * 0.5} ${BOT - h} Q${x + step * 0.6} ${BOT - h * 0.4} ${x + step} ${BOT - 10}`;
-      }
-      p2 += ` L${bx + bw} ${BOT} Z`;
-      return `<path d="${p1}" fill="${a}"/><path d="${p2}" fill="${lum(a) > 0.7 ? "#c62828" : "#f2b705"}" opacity=".85"/>`;
-    }
-    case "checker":
-      return `<rect x="${bx}" y="${BOT - 96}" width="${bw}" height="44" fill="url(#checker)"/><rect x="${bx}" y="${BOT - 100}" width="${bw}" height="4" fill="${d.trim}"/><rect x="${bx}" y="${BOT - 52}" width="${bw}" height="4" fill="${d.trim}"/>`;
-    default:
-      return isFancyWrap(d.wrap) ? drawFancyWrap(d.wrap, { x: bx, y: TOP, w: bw, h: H }, d, "scene-") : "";
-  }
+  return d.wrap === "full" ? drawFullWrap({ x: g.bx, y: TOP, w: g.bw, h: H }, d, "scene-") : "";
 }
 
 function defs(d: Design, night: boolean): string {
@@ -245,7 +196,7 @@ function wheel(d: Design, cx: number): string {
   );
 }
 
-const LAYER: Partial<Record<Item["type"], number>> = { door: 1, window: 2, window_s: 2, menu: 3, tv: 3, ac: 3, text: 5, decal: 4, counter: 6, awning: 7, vent: 0, sign: 0 };
+const LAYER: Partial<Record<Item["type"], number>> = { door: 1, window: 2, window_s: 2, tv: 3, ac: 3, text: 5, counter: 6, awning: 7, sign: 0 };
 
 export function renderExterior(d: Design, night: boolean): string {
   const g = layout(d), { bx, bw, L } = g;
@@ -323,6 +274,13 @@ export function renderExterior(d: Design, night: boolean): string {
   return s;
 }
 
+/** [item, how many] in first-added order — customers can add several of the same item. */
+export function equipCounts(equip: readonly EquipKey[]): [EquipKey, number][] {
+  const m = new Map<EquipKey, number>();
+  equip.forEach((k) => m.set(k, (m.get(k) ?? 0) + 1));
+  return [...m];
+}
+
 /* ---------------- floor plan ---------------- */
 export type PlanData = {
   rows: { b: EquipKey[]; f: EquipKey[] };
@@ -374,7 +332,7 @@ export function renderPlan(d: Design, night: boolean): string {
     });
   const block = (k: EquipKey, x: number, y: number, w: number, h: number, over: boolean) => {
     const e = EQUIP[k];
-    const col = e.cook ? "#ff7a1a" : e.req ? "#2457d6" : /fridge|reachin|freezer|ice/.test(k) ? "#00a0a8" : "#6d7684";
+    const col = e.cook ? "#ff7a1a" : e.req ? "#2457d6" : e.cold ? "#00a0a8" : "#6d7684";
     return `<g><rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="5" fill="${col}" fill-opacity="${over ? 0.25 : 0.16}" stroke="${over ? "#ff5a4a" : col}" stroke-width="2.4" ${over ? 'stroke-dasharray="6 4"' : ""}/>
       <text x="${x + w / 2}" y="${y + h / 2 - 2}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="${Math.max(8, Math.min(14, (w - 10) / (e.n.length * 0.56)))}" fill="${night ? "#e8ecf2" : "#1b2230"}">${esc(e.n.toUpperCase())}</text>
       <text x="${x + w / 2}" y="${y + h / 2 + 15}" text-anchor="middle" font-family="Barlow,sans-serif" font-size="11" fill="${dim}">${e.w} ft</text></g>`;
@@ -440,7 +398,7 @@ export function standaloneSvg(d: Design, opts: { view?: View; night?: boolean; f
 export function specList(d: Design): [string, string][] {
   const pd = planData(d), it = d.items;
   const cnt = (t: Item["type"]) => it.filter((i) => i.type === t).length;
-  const wrapName = WRAPS.find((w) => w[0] === (d.wrap as WrapStyle))?.[1] ?? d.wrap;
+  const wrapName = WRAPS.find((w) => w[0] === d.wrap)?.[1] ?? d.wrap;
   const out: [string, string][] = [
     ["Size", `${d.len} ft · ${["", "single", "tandem", "triple"][axles(d.len)]} axle`],
     ["Wrap", `${wrapName} · body ${d.body} · accent ${d.accent} · trim ${d.trim}`],
@@ -451,7 +409,7 @@ export function specList(d: Design): [string, string][] {
   (
     [
       ["window", "service window"], ["window_s", "small window"], ["awning", "awning"], ["counter", "serving shelf"], ["door", "side door"],
-      ["menu", "menu board"], ["tv", "TV menu"], ["ac", "A/C unit"], ["vent", "roof vent"], ["sign", "roof sign"],
+      ["tv", "TV menu"], ["ac", "A/C unit"], ["sign", "roof sign"],
     ] as const
   ).forEach(([t, n]) => {
     const c = cnt(t);
@@ -468,7 +426,7 @@ export function specList(d: Design): [string, string][] {
   if (d.smoker) o.push("BBQ smoker");
   if (o.length) out.push(["Options", o.join(", ")]);
   if (cnt("sign") && d.signText) out.push(["Roof sign", `"${d.signText}"`]);
-  out.push(["Kitchen", d.equip.map((k) => EQUIP[k]?.n).filter(Boolean).join(", ") + (pd.hasCook ? ", hood + fire suppression" : "")]);
+  out.push(["Kitchen", equipCounts(d.equip).map(([k, n]) => (n > 1 ? `${n}× ${EQUIP[k].n}` : EQUIP[k].n)).join(", ") + (pd.hasCook ? ", hood + fire suppression" : "")]);
   if (pd.over) out.push(["Note", `Equipment needs ~${pd.rec} ft`]);
   return out;
 }
@@ -487,12 +445,11 @@ export type SpecSection = { title: string; rows: SpecRow[] };
 /** Everything the customer chose, grouped for the shop. */
 export function specSections(d: Design): SpecSection[] {
   const pd = planData(d);
-  const wrapName = WRAPS.find((w) => w[0] === d.wrap)?.[1] ?? d.wrap;
   const fontName = (f: string) => ({ "Big Shoulders Display": "Bold", Bungee: "Street", Pacifico: "Script", Lobster: "Retro", Rye: "Western", "Permanent Marker": "Marker", "Barlow Condensed": "Clean" })[f] ?? f;
   const yes = (b: boolean) => (b ? "Yes" : "No");
   const label: Partial<Record<Item["type"], string>> = {
     window: "Service window", window_s: "Small window", awning: "Awning", counter: "Serving shelf", door: "Side door",
-    menu: "Menu board", tv: "TV menu", ac: "A/C unit", vent: "Roof vent", sign: "Roof sign",
+    tv: "TV menu", ac: "A/C unit", sign: "Roof sign",
   };
   // position along the trailer, measured from the hitch end
   const at = (i: Item) => `${Math.max(0, i.x).toFixed(1)} ft from hitch end`;
@@ -501,7 +458,6 @@ export function specSections(d: Design): SpecSection[] {
     .filter((i) => label[i.type])
     .sort((a, b) => a.x - b.x)
     .map((i) => ({ label: label[i.type]!, value: i.type === "sign" ? `"${(d.signText || "EATS").toUpperCase()}" · ${at(i)}` : at(i) }));
-  const decals = d.items.filter((i) => i.type === "decal").map((i) => i.emoji || "⭐");
   const texts = d.items.filter((i) => i.type === "text" && !i.role && i.text).map((i) => `"${i.text}" (${fontName(i.font || "Barlow Condensed")})`);
 
   const sections: SpecSection[] = [
@@ -520,7 +476,7 @@ export function specSections(d: Design): SpecSection[] {
     {
       title: "Wrap & colors",
       rows: [
-        { label: "Wrap design", value: wrapName },
+        { label: "Wrap", value: d.wrap === "full" ? "Full custom wrap (artwork designed with the customer)" : "No wrap (solid paint in the body color)" },
         { label: "Body color", value: colorName(d.body), swatch: d.body },
         { label: "Accent color", value: colorName(d.accent), swatch: d.accent },
         { label: "Trim color", value: colorName(d.trim), swatch: d.trim },
@@ -535,7 +491,6 @@ export function specSections(d: Design): SpecSection[] {
         { label: "Tagline", value: d.tag || "—" },
         { label: "Phone / handle on trailer", value: d.phone || "—" },
         ...(texts.length ? [{ label: "Extra text", value: texts.join(", ") }] : []),
-        ...(decals.length ? [{ label: "Food decals", value: decals.join("  ") }] : []),
       ],
     },
     { title: "Exterior pieces", rows: pieces.length ? pieces : [{ label: "Pieces", value: "None added" }] },
@@ -543,7 +498,10 @@ export function specSections(d: Design): SpecSection[] {
       title: "Kitchen",
       rows: [
         { label: "Cooking style", value: CUISINES[d.cuisine].n },
-        ...d.equip.map((k) => ({ label: EQUIP[k].n, value: `${EQUIP[k].w} ft · ${EQUIP[k].row === "b" ? "back wall" : "front wall"}${EQUIP[k].req ? " · required" : ""}` })),
+        ...equipCounts(d.equip).map(([k, n]) => ({
+          label: n > 1 ? `${n}× ${EQUIP[k].n}` : EQUIP[k].n,
+          value: `${EQUIP[k].w} ft each · ${EQUIP[k].row === "b" ? "back wall" : "front wall"}${EQUIP[k].req ? " · required" : ""}`,
+        })),
         ...(pd.hasCook ? [{ label: "Hood + fire suppression", value: "Over the cooking line" }] : []),
         { label: "Back wall used", value: `${pd.used.b.toFixed(1)} of ${pd.avail.b} ft` },
         { label: "Front wall used", value: `${pd.used.f.toFixed(1)} of ${pd.avail.f} ft` },
@@ -558,16 +516,7 @@ export function specSections(d: Design): SpecSection[] {
 /** Picker thumbnail. Pass the customer's colors to preview each wrap in them. */
 export function wrapThumb(w: WrapStyle, cols?: { body: string; accent: string; trim: string }): string {
   const b = cols?.body ?? "#2457d6", a = cols?.accent ?? "#ff7a1a", t = cols?.trim ?? "#111317";
-  if (isFancyWrap(w)) return `<rect width="80" height="48" fill="${b}"/>${drawFancyWrap(w, { x: 0, y: 0, w: 80, h: 48 }, { body: b, accent: a, trim: t }, `th-${w}-`)}`;
-  const m: Record<string, string> = {
-    solid: "",
-    twotone: `<rect y="26" width="80" height="22" fill="${a}"/>`,
-    stripe: `<rect y="28" width="80" height="8" fill="${a}"/>`,
-    swoosh: `<path d="M0 48V34C30 40 50 14 80 8V48Z" fill="${a}"/>`,
-    flames: `<path d="M0 48Q6 34 10 24Q14 36 20 40Q24 26 30 18Q34 34 40 40Q46 28 50 22Q54 36 60 40Q64 30 70 24Q74 36 80 38V48Z" fill="${a}"/>`,
-    checker: `<g fill="${t}">${Array.from({ length: 10 }, (_, i) => `<rect x="${i * 8}" y="${30 + (i % 2) * 5}" width="4" height="5"/><rect x="${i * 8 + 4}" y="${30 + ((i + 1) % 2) * 5}" width="4" height="5"/>`).join("")}</g><rect y="30" width="80" height="10" fill="${a}" opacity=".5"/>`,
-  };
-  return `<rect width="80" height="48" fill="${b}"/>${m[w]}`;
+  return `<rect width="80" height="48" fill="${b}"/>${w === "full" ? drawFullWrap({ x: 0, y: 0, w: 80, h: 48 }, { body: b, accent: a, trim: t }, `th-${w}-`) : ""}`;
 }
 
 export const GADGET_ICONS: Record<string, string> = {
@@ -576,10 +525,8 @@ export const GADGET_ICONS: Record<string, string> = {
   awning: '<path d="M10 8h34l6 14H4z" fill="#ff7a1a"/><path d="M17 8h7l-2 14h-8zM31 8h7l4 14h-8z" fill="#fff"/>',
   counter: '<rect x="4" y="12" width="46" height="5" rx="1" fill="#b9c1cc"/><path d="M10 17l7 10M44 17l-7 10" stroke="#8b97a8" stroke-width="2.5"/>',
   door: '<rect x="18" y="2" width="18" height="32" rx="1" fill="#2a3442" stroke="#c9d2de" stroke-width="2"/><rect x="21" y="6" width="12" height="9" rx="2" fill="#7fa0bd"/><rect x="31" y="18" width="3" height="6" fill="#c9d2de"/>',
-  menu: '<rect x="15" y="3" width="24" height="30" rx="2" fill="#1b1f26" stroke="#c9d2de" stroke-width="2"/><path d="M19 11h12M19 16h14M19 21h10M19 26h13" stroke="#e8ecf2" stroke-width="2"/>',
   tv: '<rect x="9" y="6" width="36" height="22" rx="2" fill="#1b3f8a" stroke="#c9d2de" stroke-width="2"/><path d="M21 33h12" stroke="#c9d2de" stroke-width="2"/>',
   ac: '<rect x="11" y="6" width="32" height="22" rx="3" fill="#e9edf2"/><path d="M15 11h24M15 15h24M15 19h24M15 23h24" stroke="#8b97a8" stroke-width="1.6"/>',
-  vent: '<path d="M12 18Q27 2 42 18Z" fill="#b9c1cc"/><rect x="17" y="18" width="20" height="13" fill="#b9c1cc"/><path d="M17 22h20M17 26h20" stroke="#6d7684"/>',
   sign: '<rect x="5" y="4" width="44" height="18" rx="3" fill="#ff7a1a"/><text x="27" y="18" text-anchor="middle" font-family="Impact,sans-serif" font-size="12" fill="#fff">EATS</text><path d="M14 22v10M40 22v10" stroke="#c9d2de" stroke-width="2.5"/>',
   text: '<text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="26" font-weight="700" fill="#f3f6fa">Aa</text>',
 };

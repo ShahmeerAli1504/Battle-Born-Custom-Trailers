@@ -60,7 +60,8 @@ export const designSchema = z.object({
   tag: z.string().max(40),
   phone: z.string().max(24),
   signText: z.string().max(16),
-  equip: z.array(z.enum(EQUIP_KEYS as [EquipKey, ...EquipKey[]])).max(EQUIP_KEYS.length),
+  // the same item can appear more than once (e.g. two fryers)
+  equip: z.array(z.enum(EQUIP_KEYS as [EquipKey, ...EquipKey[]])).max(40),
   items: z.array(itemSchema).max(80),
 });
 
@@ -83,7 +84,7 @@ export const mk = (type: GadgetType, x: number, extra: Partial<Item> = {}): Item
 /** Starting point: a bare trailer with nothing on it. The customer makes every choice. */
 export function emptyDesign(): Design {
   return {
-    len: 20, wrap: "solid", body: "#e9edf2", accent: "#c2cad4", trim: "#2a2f38", text: "#111317", font: "Big Shoulders Display",
+    len: 20, wrap: "none", body: "#e9edf2", accent: "#c2cad4", trim: "#2a2f38", text: "#111317", font: "Big Shoulders Display",
     plate: false, lights: false, porch: false, chrome: false, propane: false, generator: false, smoker: false,
     cuisine: "other", name: "", tag: "", phone: "", signText: "", equip: [], items: [],
   };
@@ -91,16 +92,16 @@ export function emptyDesign(): Design {
 
 export function preset(kind: PresetKey): Design {
   const base: Omit<Design, "equip" | "items"> = {
-    len: 20, wrap: "twotone", body: "#c62828", accent: "#111317", trim: "#111317", text: "#ffffff", font: "Big Shoulders Display",
+    len: 20, wrap: "full", body: "#c62828", accent: "#111317", trim: "#111317", text: "#ffffff", font: "Big Shoulders Display",
     plate: true, lights: true, porch: true, chrome: false, propane: true, generator: true, smoker: false,
     cuisine: "tacos", name: "Your Business Name", tag: "Authentic street food", phone: "775-555-0123", signText: "TACOS",
   };
   const P: Record<PresetKey, Partial<Design>> = {
     tacos: {},
-    bbq: { len: 20, wrap: "flames", body: "#111317", accent: "#ff7a1a", trim: "#2a2f38", text: "#f2b705", font: "Rye", smoker: true, cuisine: "bbq", name: "Smokestack BBQ", tag: "Low & slow, every day", signText: "BBQ" },
-    desserts: { len: 18, wrap: "swoosh", body: "#ff4f9a", accent: "#ffffff", trim: "#111317", text: "#ffffff", font: "Pacifico", cuisine: "desserts", name: "Sweet Spot", tag: "Shakes · Sundaes · Treats", signText: "SHAKES", generator: false },
-    coffee: { len: 14, wrap: "stripe", body: "#0f1b33", accent: "#c9a24a", trim: "#c9a24a", text: "#ffffff", font: "Lobster", cuisine: "coffee", name: "Rolling Roast", tag: "Espresso on the go", signText: "COFFEE", propane: false, porch: false },
-    blank: { wrap: "solid", body: "#f3f4f6", accent: "#9aa4b0", trim: "#111317", text: "#111317", lights: false, porch: false, name: "", tag: "", phone: "", signText: "", cuisine: "other" },
+    bbq: { len: 20, wrap: "full", body: "#111317", accent: "#ff7a1a", trim: "#2a2f38", text: "#f2b705", font: "Rye", smoker: true, cuisine: "bbq", name: "Smokestack BBQ", tag: "Low & slow, every day", signText: "BBQ" },
+    desserts: { len: 18, wrap: "full", body: "#ff4f9a", accent: "#ffffff", trim: "#111317", text: "#ffffff", font: "Pacifico", cuisine: "desserts", name: "Sweet Spot", tag: "Shakes · Sundaes · Treats", signText: "SHAKES", generator: false },
+    coffee: { len: 14, wrap: "full", body: "#0f1b33", accent: "#c9a24a", trim: "#c9a24a", text: "#ffffff", font: "Lobster", cuisine: "coffee", name: "Rolling Roast", tag: "Espresso on the go", signText: "COFFEE", propane: false, porch: false },
+    blank: { wrap: "none", body: "#f3f4f6", accent: "#9aa4b0", trim: "#111317", text: "#111317", lights: false, porch: false, name: "", tag: "", phone: "", signText: "", cuisine: "other" },
   };
   const s: Design = { ...base, ...P[kind], equip: [], items: [] };
   const L = s.len;
@@ -115,29 +116,13 @@ export function preset(kind: PresetKey): Design {
     mk("counter", L * 0.4),
     mk("door", L * 0.82),
     mk("ac", L * 0.66),
-    mk("vent", L * 0.25),
     mk("sign", L * 0.45),
     mk("text", L * 0.42, { y: TOP + 205, role: "name", size: 46 }),
     mk("text", L * 0.42, { y: TOP + 236, role: "tag", size: 20 }),
     mk("text", L * 0.1, { y: TOP + 140, role: "phone", size: 16 }),
   ];
-  const deco: Partial<Record<PresetKey, [string, string]>> = { tacos: ["🌮", "🌶️"], bbq: ["🔥", "🍖"], desserts: ["🍦", "🍩"], coffee: ["☕", "🧋"] };
-  const d = deco[kind];
-  if (d) {
-    s.items.push(mk("decal", L * 0.1, { y: TOP + 80, emoji: d[0], size: 64 }));
-    s.items.push(mk("decal", L * 0.7, { y: TOP + 180, emoji: d[1], size: 52 }));
-  }
-  if (kind !== "coffee") s.items.push(mk("menu", L * 0.66));
+  if (kind !== "coffee") s.items.push(mk("tv", L * 0.66));
   if (kind === "bbq" || kind === "tacos") s.items.push(mk("window_s", L * 0.12, { y: 0 }));
-  if (kind === "bbq") {
-    const first = s.items.find((i) => i.type === "decal");
-    if (first) {
-      first.x = L * 0.12;
-      first.y = TOP + 30;
-    }
-    s.items = s.items.filter((i) => !(i.type === "decal" && i.emoji === "🔥"));
-    s.items.push(mk("decal", L * 0.12, { y: TOP + 215, emoji: "🔥", size: 54 }));
-  }
   return s;
 }
 
@@ -148,7 +133,7 @@ export function itemW(it: Pick<Item, "type">, d: Pick<Design, "signText">): numb
   return GADGETS[it.type]?.w ?? 2;
 }
 
-export const isFree = (t: GadgetType) => t === "text" || t === "decal";
+export const isFree = (t: GadgetType) => t === "text";
 
 export function clampItem(it: Item, d: Design): Item {
   const hw = itemW(it, d) / 2;
@@ -173,9 +158,33 @@ export function decodeDesign(code: string): Design | null {
   try {
     const bin = atob(decodeURIComponent(code));
     const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
-    const parsed = designSchema.safeParse(JSON.parse(new TextDecoder().decode(bytes)));
+    const parsed = designSchema.safeParse(migrateDesign(JSON.parse(new TextDecoder().decode(bytes))));
     return parsed.success ? parsed.data : null;
   } catch {
     return null;
   }
+}
+
+/* ---------------- older saved designs ---------------- */
+
+/** Equipment from earlier versions of the builder → today's closest item (null = no longer offered). */
+const OLD_EQUIP: Record<string, EquipKey | null> = {
+  griddle: "grill3", charbroil: "grill3", fryer: "fryer2", range: "stove6", wok: "stove4", warmer: "steam2",
+  reachin: "fridge1", freezer: "freezer1", prepfridge: "prep4", steam: "steam3",
+  pizza: null, rice: null, ice: null, espresso: null, blender: null,
+};
+const REMOVED_ITEMS = new Set(["decal", "menu", "vent"]);
+
+/** Bring a design saved by an older version of the builder up to date, so old share links still open. */
+export function migrateDesign(raw: unknown): unknown {
+  if (!raw || typeof raw !== "object") return raw;
+  const d = { ...(raw as Record<string, unknown>) };
+  if (typeof d.wrap === "string" && d.wrap !== "none" && d.wrap !== "full") d.wrap = d.wrap === "solid" ? "none" : "full";
+  if (Array.isArray(d.equip)) {
+    d.equip = d.equip
+      .map((k) => (typeof k === "string" && k in OLD_EQUIP ? OLD_EQUIP[k] : k))
+      .filter((k) => k !== null);
+  }
+  if (Array.isArray(d.items)) d.items = d.items.filter((i) => !(i && typeof i === "object" && REMOVED_ITEMS.has(String((i as { type?: unknown }).type))));
+  return d;
 }

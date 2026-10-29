@@ -28,7 +28,7 @@ export function requirements(step: StepKey, d: Design, picked: ReadonlySet<Pick>
         { label: "Enter your business name", done: d.name.trim().length > 0 },
         { label: "Pick a name font", done: picked.has("font") },
         { label: "Pick a text color", done: picked.has("text") },
-        { label: "Choose a wrap design", done: picked.has("wrap") },
+        { label: "Choose full custom wrap or no wrap", done: picked.has("wrap") },
       ];
     case "kitchen":
       return [

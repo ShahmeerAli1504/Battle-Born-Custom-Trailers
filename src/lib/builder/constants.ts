@@ -1,6 +1,5 @@
 /* Trailer builder — static data. Equipment sizes, cooking presets and colors live here. */
 
-import { FANCY_WRAPS } from "./wraps";
 
 /** Scene geometry (SVG units). PPF = pixels per foot of trailer length. */
 export const W = 1500;
@@ -23,16 +22,11 @@ export const COLORS = {
 } as const;
 export type ColorKey = keyof typeof COLORS;
 
-export const BASIC_WRAPS = [
-  ["solid", "Solid"],
-  ["twotone", "Two-tone"],
-  ["stripe", "Stripe"],
-  ["swoosh", "Swoosh"],
-  ["flames", "Flames"],
-  ["checker", "Checker"],
+/** Wraps are fully custom artwork, so the customer only chooses whether they want one. */
+export const WRAPS = [
+  ["none", "No wrap"],
+  ["full", "Full custom wrap"],
 ] as const;
-/** All wraps: the classic paint layouts, then the graphic wraps from wraps.ts. */
-export const WRAPS = [...BASIC_WRAPS, ...FANCY_WRAPS] as const;
 export type WrapStyle = (typeof WRAPS)[number][0];
 
 export const FONTS = [
@@ -46,47 +40,71 @@ export const FONTS = [
 export const TEXT_FONTS = [...FONTS, ["Barlow Condensed", "Clean"]] as const;
 
 export type EquipKey =
-  | "griddle" | "charbroil" | "fryer" | "fryer2" | "range" | "wok" | "pizza" | "warmer" | "rice"
-  | "reachin" | "freezer" | "ice" | "prepfridge" | "steam" | "espresso" | "blender" | "sink3" | "handsink";
+  | "fryer2"
+  | "steam1" | "steam2" | "steam3"
+  | "stove2" | "stove4" | "stove6"
+  | "grill2" | "grill3" | "grill4"
+  | "fridge1" | "fridge2"
+  | "freezer1" | "freezer2"
+  | "prep2" | "prep3" | "prep4" | "prep5"
+  | "sink3" | "handsink";
 
-/** w = feet of wall; row b = back wall (street side), f = front (window side). */
-export const EQUIP: Record<EquipKey, { n: string; w: number; row: "b" | "f"; cook?: boolean; req?: boolean }> = {
-  griddle: { n: "Flat-top griddle", w: 3, row: "b", cook: true },
-  charbroil: { n: "Charbroiler", w: 3, row: "b", cook: true },
-  fryer: { n: "Fryer", w: 1.5, row: "b", cook: true },
-  fryer2: { n: "Double fryer", w: 3, row: "b", cook: true },
-  range: { n: "6-burner range", w: 3, row: "b", cook: true },
-  wok: { n: "Wok range", w: 3, row: "b", cook: true },
-  pizza: { n: "Pizza oven", w: 4, row: "b", cook: true },
-  warmer: { n: "Holding cabinet", w: 2, row: "b" },
-  rice: { n: "Rice cooker / warmer", w: 2, row: "f" },
-  reachin: { n: "Reach-in fridge", w: 2.5, row: "b" },
-  freezer: { n: "Freezer", w: 2.5, row: "b" },
-  ice: { n: "Ice machine", w: 2.5, row: "b" },
-  prepfridge: { n: "Prep table fridge", w: 4, row: "f" },
-  steam: { n: "Steam table", w: 4, row: "f" },
-  espresso: { n: "Espresso machine", w: 3, row: "f" },
-  blender: { n: "Blender station", w: 3, row: "f" },
+type Equip = { n: string; w: number; row: "b" | "f"; cook?: boolean; cold?: boolean; req?: boolean };
+
+/** w = feet of wall it takes; row b = back wall (street side), f = front (window side). */
+export const EQUIP: Record<EquipKey, Equip> = {
+  fryer2: { n: "Double-basket fryer", w: 1.5, row: "b", cook: true },
+  steam1: { n: "1-well steam table", w: 1.5, row: "f" },
+  steam2: { n: "2-well steam table", w: 2.5, row: "f" },
+  steam3: { n: "3-well steam table", w: 3.5, row: "f" },
+  stove2: { n: "2-burner stove", w: 1, row: "b", cook: true },
+  stove4: { n: "4-burner stove", w: 2, row: "b", cook: true },
+  stove6: { n: "6-burner stove", w: 3, row: "b", cook: true },
+  grill2: { n: "2 ft flat-top grill", w: 2, row: "b", cook: true },
+  grill3: { n: "3 ft flat-top grill", w: 3, row: "b", cook: true },
+  grill4: { n: "4 ft flat-top grill", w: 4, row: "b", cook: true },
+  fridge1: { n: "Single-door upright refrigerator", w: 2.5, row: "b", cold: true },
+  fridge2: { n: "Double-door upright refrigerator", w: 4.5, row: "b", cold: true },
+  freezer1: { n: "Single-door upright freezer", w: 2.5, row: "b", cold: true },
+  freezer2: { n: "Double-door upright freezer", w: 4.5, row: "b", cold: true },
+  prep2: { n: "2 ft cold prep table", w: 2, row: "f", cold: true },
+  prep3: { n: "3 ft cold prep table", w: 3, row: "f", cold: true },
+  prep4: { n: "4 ft cold prep table", w: 4, row: "f", cold: true },
+  prep5: { n: "5 ft cold prep table", w: 5, row: "f", cold: true },
   sink3: { n: "3-compartment sink", w: 5, row: "f", req: true },
   handsink: { n: "Hand-wash sink", w: 1.5, row: "f", req: true },
 };
 export const EQUIP_KEYS = Object.keys(EQUIP) as EquipKey[];
 
+/** How the equipment list is grouped in the builder. Customers can add several of any item. */
+export const EQUIP_GROUPS: { title: string; keys: EquipKey[]; note?: string }[] = [
+  { title: "Fryers", keys: ["fryer2"] },
+  { title: "Steam tables", keys: ["steam1", "steam2", "steam3"] },
+  { title: "Burners", keys: ["stove2", "stove4", "stove6"] },
+  { title: "Flat-top grills", keys: ["grill2", "grill3", "grill4"] },
+  { title: "Refrigerators", keys: ["fridge1", "fridge2"] },
+  { title: "Freezers", keys: ["freezer1", "freezer2"] },
+  { title: "Cold prep tables", keys: ["prep2", "prep3", "prep4", "prep5"] },
+  { title: "Sinks", keys: ["sink3", "handsink"], note: "Required by the health department" },
+];
+/** Most of one item a customer can add. */
+export const MAX_QTY = 4;
+
 export type CuisineKey = "tacos" | "bbq" | "burgers" | "pizza" | "desserts" | "coffee" | "asian" | "other";
 
 export const CUISINES: Record<CuisineKey, { e: string; n: string; sign: string; equip: EquipKey[] }> = {
-  tacos: { e: "🌮", n: "Tacos", sign: "TACOS", equip: ["griddle", "fryer", "prepfridge", "reachin", "steam", "sink3", "handsink"] },
-  bbq: { e: "🔥", n: "BBQ", sign: "BBQ", equip: ["charbroil", "warmer", "prepfridge", "reachin", "sink3", "handsink"] },
-  burgers: { e: "🍔", n: "Burgers", sign: "BURGERS", equip: ["griddle", "fryer2", "prepfridge", "freezer", "sink3", "handsink"] },
-  pizza: { e: "🍕", n: "Pizza", sign: "PIZZA", equip: ["pizza", "prepfridge", "reachin", "sink3", "handsink"] },
-  desserts: { e: "🍦", n: "Desserts", sign: "SHAKES", equip: ["freezer", "reachin", "blender", "prepfridge", "sink3", "handsink"] },
-  coffee: { e: "☕", n: "Coffee", sign: "COFFEE", equip: ["espresso", "reachin", "ice", "sink3", "handsink"] },
-  asian: { e: "🍜", n: "Asian", sign: "NOODLES", equip: ["wok", "fryer", "rice", "prepfridge", "reachin", "sink3", "handsink"] },
-  other: { e: "⭐", n: "Other", sign: "EATS", equip: ["griddle", "prepfridge", "reachin", "sink3", "handsink"] },
+  tacos: { e: "🌮", n: "Tacos", sign: "TACOS", equip: ["grill3", "fryer2", "prep4", "fridge1", "steam3", "sink3", "handsink"] },
+  bbq: { e: "🔥", n: "BBQ", sign: "BBQ", equip: ["steam2", "prep3", "fridge1", "freezer1", "sink3", "handsink"] },
+  burgers: { e: "🍔", n: "Burgers", sign: "BURGERS", equip: ["grill4", "fryer2", "prep3", "freezer1", "sink3", "handsink"] },
+  pizza: { e: "🍕", n: "Pizza", sign: "PIZZA", equip: ["prep5", "fridge1", "freezer1", "sink3", "handsink"] },
+  desserts: { e: "🍦", n: "Desserts", sign: "SHAKES", equip: ["freezer2", "fridge1", "prep3", "sink3", "handsink"] },
+  coffee: { e: "☕", n: "Coffee", sign: "COFFEE", equip: ["fridge1", "prep2", "sink3", "handsink"] },
+  asian: { e: "🍜", n: "Asian", sign: "NOODLES", equip: ["stove4", "fryer2", "steam2", "prep3", "fridge1", "sink3", "handsink"] },
+  other: { e: "⭐", n: "Other", sign: "EATS", equip: ["grill3", "prep3", "fridge1", "sink3", "handsink"] },
 };
 export const CUISINE_KEYS = Object.keys(CUISINES) as CuisineKey[];
 
-export type GadgetType = "window" | "window_s" | "awning" | "counter" | "door" | "menu" | "tv" | "ac" | "vent" | "sign" | "text" | "decal";
+export type GadgetType = "window" | "window_s" | "awning" | "counter" | "door" | "tv" | "ac" | "sign" | "text";
 
 export const GADGETS: Record<GadgetType, { n: string; w: number }> = {
   window: { n: "Service window", w: 6 },
@@ -94,18 +112,13 @@ export const GADGETS: Record<GadgetType, { n: string; w: number }> = {
   awning: { n: "Awning", w: 6.5 },
   counter: { n: "Serving shelf", w: 6 },
   door: { n: "Side door", w: 2.6 },
-  menu: { n: "Menu board", w: 2.6 },
   tv: { n: "TV menu", w: 3 },
   ac: { n: "A/C unit", w: 2.3 },
-  vent: { n: "Roof vent", w: 2.2 },
   sign: { n: "Roof sign", w: 6 },
   text: { n: "Text", w: 4 },
-  decal: { n: "Decal", w: 2 },
 };
 export const GADGET_TYPES = Object.keys(GADGETS) as GadgetType[];
-export const PALETTE: GadgetType[] = ["window", "window_s", "awning", "counter", "door", "menu", "tv", "ac", "vent", "sign", "text"];
-
-export const EMOJI = ["🌮", "🌯", "🍔", "🍟", "🍕", "🌭", "🍗", "🍖", "🔥", "🌶️", "🍦", "🍩", "☕", "🧋", "🍜", "🥟", "🍤", "⭐"];
+export const PALETTE: GadgetType[] = ["window", "window_s", "awning", "counter", "door", "tv", "ac", "sign", "text"];
 
 export type ExteriorOption = "plate" | "lights" | "porch" | "chrome" | "propane" | "generator" | "smoker";
 export const EXTERIOR_OPTIONS: { key: ExteriorOption; label: string; group: "exterior" | "tongue" }[] = [

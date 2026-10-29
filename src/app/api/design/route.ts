@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { designRequestSchema, fieldErrors } from "@/lib/schemas";
-import { designSchema, encodeDesign } from "@/lib/builder/design";
+import { designSchema, encodeDesign, migrateDesign } from "@/lib/builder/design";
 import { specSections } from "@/lib/builder/scene";
 import { MailConfigError, confirmationEmail, confirmationsEnabled, emailShell, escapeHtml, inbox, rowsTable, rowsText, sendMail } from "@/lib/mailer";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
   const r = parsed.data;
   if (r.website) return NextResponse.json({ ok: true });
 
-  const design = designSchema.safeParse(r.design);
+  const design = designSchema.safeParse(migrateDesign(r.design));
   if (!design.success) {
     return NextResponse.json({ ok: false, error: "That design couldn't be read — please refresh the builder and try again." }, { status: 422 });
   }

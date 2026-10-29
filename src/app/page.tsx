@@ -168,7 +168,7 @@ export default function HomePage() {
           </div>
           <Link className="teaser-frame reveal" data-delay="1" href="/builder" aria-label="Open the trailer builder">
             <Image src="/assets/img/builder-preview.jpg" alt="Example trailer designed in the Battle Born trailer builder" width={1600} height={730} sizes="(max-width: 900px) 100vw, 50vw" />
-            <span className="teaser-chip c1">🌮 Drag on decals</span>
+            <span className="teaser-chip c1">🪟 Drag on windows</span>
             <span className="teaser-chip c2">🎨 Pick your colors</span>
             <span className="teaser-chip c3">📐 Floor plan</span>
           </Link>
