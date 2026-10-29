@@ -1,0 +1,18 @@
+#!/bin/sh
+# Nexora guard: only allow pushes to "main" (the branch Vercel deploys to Production).
+# Deleting a remote branch is still allowed. Override once with: git push --no-verify
+zero=0000000000000000000000000000000000000000
+while read local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$zero" ] && continue
+  if [ "$remote_ref" != "refs/heads/main" ]; then
+    branch=${remote_ref#refs/heads/}
+    echo ""
+    echo "  BLOCKED: you're pushing to '$branch', not 'main'."
+    echo "  Vercel only deploys 'main' to the live site - this would only make a Preview."
+    echo ""
+    echo "  Fix:  git checkout main  &&  git merge $branch  &&  git push"
+    echo ""
+    exit 1
+  fi
+done
+exit 0
