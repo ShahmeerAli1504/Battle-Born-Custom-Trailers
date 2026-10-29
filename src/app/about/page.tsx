@@ -5,7 +5,7 @@ import { Icon } from "@/components/ui/Icon";
 import { SoundVideo } from "@/components/media/Videos";
 import { CtaBand, PageHero, SectionHead } from "@/components/sections/Sections";
 import { FounderStory } from "@/components/sections/Founder";
-import { FOUNDER } from "@/lib/content";
+import { OWNERS } from "@/lib/content";
 import { instagramUrl, site } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
@@ -15,18 +15,18 @@ export const metadata: Metadata = pageMetadata({
   image: { url: "/assets/video/one-year.jpg", alt: "About Us — Meet David & Oliver Mendoza — Battle Born Custom Trailers" },
 });
 
-/** Tells search engines who the founder is (shows up in Google's knowledge results). */
-const founderJsonLd = {
+/** Tells search engines who the owners are (can show up in Google's knowledge results). */
+const founderJsonLd = OWNERS.map((o) => ({
   "@context": "https://schema.org",
   "@type": "Person",
-  name: FOUNDER.name,
-  jobTitle: "Founder",
-  description: FOUNDER.intro,
-  homeLocation: { "@type": "Place", name: "Northern Nevada" },
+  name: o.name,
+  jobTitle: o.signLabel,
+  description: o.intro,
+  ...(o.id === "founder" ? { homeLocation: { "@type": "Place", name: "Northern Nevada" } } : {}),
   worksFor: { "@type": "Organization", name: site.name, url: site.url },
-  url: absoluteUrl("/about#founder"),
-  sameAs: site.people.filter((p) => p.name === FOUNDER.name).map((p) => instagramUrl(p.instagram)),
-};
+  url: absoluteUrl(`/about#${o.id}`),
+  sameAs: site.people.filter((p) => p.name === o.name).map((p) => instagramUrl(p.instagram)),
+}));
 
 export default function AboutPage() {
   return (

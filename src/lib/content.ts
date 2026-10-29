@@ -141,10 +141,27 @@ export const TIMELINES = ["As soon as possible", "1–3 months", "3–6 months",
 export const HEARD_FROM = ["Instagram", "Facebook", "Google", "Referral / word of mouth", "Saw one of your trailers", "Other"] as const;
 export const LANGUAGES = ["English", "Español"] as const;
 
-/* ---------- Founder (shown on About, with a short version on Home) ---------- */
-export const FOUNDER = {
+/* ---------- Owner profiles (About page; short version of Oliver's on Home) ---------- */
+export type OwnerProfile = {
+  /** anchor on the About page: /about#<id> */
+  id: string;
+  name: string;
+  initials: string;
+  eyebrow: string;
+  titles: string[];
+  facts: string[];
+  intro: string;
+  story: string[];
+  highlight: { label: string; text: string; stars?: boolean };
+  signoff: string;
+  signLabel: string;
+};
+
+export const FOUNDER: OwnerProfile = {
+  id: "founder",
   name: "Oliver Mendoza",
   initials: "OM",
+  eyebrow: "Meet the founder",
   titles: ["Founder of Battle Born Custom Trailers", "Entrepreneur", "Business Owner"],
   facts: ["28 years old", "Born & raised in Northern Nevada", "Restaurants · taco shops · meat markets · a coffee shop"],
   intro:
@@ -155,6 +172,30 @@ export const FOUNDER = {
     "Today, through Battle Born Custom Trailers, my passion goes beyond building and selling food trailers. I want to help aspiring entrepreneurs turn their dreams into reality, guide them through the process, and help them avoid the same expensive mistakes I once made.",
     "I know firsthand what it takes to start from nothing, take risks, and build something successful.",
   ],
-  goal: "Help others succeed, save them time and money, and give them the guidance I wish I had when I first started.",
+  highlight: { label: "My goal is simple", text: "Help others succeed, save them time and money, and give them the guidance I wish I had when I first started." },
   signoff: "Your dream. Your business. Let's build it together.",
+  signLabel: "Founder",
 };
+
+export const PARTNER: OwnerProfile = {
+  id: "david",
+  name: "David Mendoza",
+  initials: "DM",
+  eyebrow: "Meet your partner",
+  titles: ["Partner, Battle Born Custom Trailers", "Sales & Project Specialist", "Owner of multiple food businesses"],
+  facts: ["Real food-business experience", "Designs & builds from scratch", "5-star customer reviews"],
+  intro: "I'm not just here to sell you a food trailer — I'm here to help you build a successful business!",
+  story: [
+    "As a salesman and owner of multiple food businesses, I know firsthand what works, where to save money, and how to maximize your profits. I'll help you design and build your dream food truck or trailer from scratch, with real business experience behind every recommendation.",
+    "For me, it's not just about making a sale. It's about building trust, long-term relationships, and helping your business succeed.",
+  ],
+  highlight: {
+    label: "Backed by real clients",
+    text: "My multiple 5-star customer reviews speak for themselves! My work, dedication, and customer satisfaction are backed by real clients who trust what I do.",
+    stars: true,
+  },
+  signoff: "Your success is my priority. Let's build something great together!",
+  signLabel: "Partner",
+};
+
+export const OWNERS = [FOUNDER, PARTNER];
