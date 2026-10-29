@@ -140,3 +140,21 @@ export const BUDGETS = ["Under $25,000", "$25,000 – $50,000", "$50,000 – $80
 export const TIMELINES = ["As soon as possible", "1–3 months", "3–6 months", "6+ months", "Just exploring"] as const;
 export const HEARD_FROM = ["Instagram", "Facebook", "Google", "Referral / word of mouth", "Saw one of your trailers", "Other"] as const;
 export const LANGUAGES = ["English", "Español"] as const;
+
+/* ---------- Founder (shown on About, with a short version on Home) ---------- */
+export const FOUNDER = {
+  name: "Oliver Mendoza",
+  initials: "OM",
+  titles: ["Founder of Battle Born Custom Trailers", "Entrepreneur", "Business Owner"],
+  facts: ["28 years old", "Born & raised in Northern Nevada", "Restaurants · taco shops · meat markets · a coffee shop"],
+  intro:
+    "My name is Oliver Mendoza. I'm 28 years old, born and raised in Northern Nevada, and a proud local entrepreneur. Over the years, I've built and operated multiple businesses, including restaurants, taco shops, meat markets, and a coffee shop.",
+  story: [
+    "But my journey wasn't always easy. When I first started, I had no guidance, made costly mistakes, and lost valuable time and money learning how to run a business.",
+    "Those experiences taught me lessons that I now use to help others.",
+    "Today, through Battle Born Custom Trailers, my passion goes beyond building and selling food trailers. I want to help aspiring entrepreneurs turn their dreams into reality, guide them through the process, and help them avoid the same expensive mistakes I once made.",
+    "I know firsthand what it takes to start from nothing, take risks, and build something successful.",
+  ],
+  goal: "Help others succeed, save them time and money, and give them the guidance I wish I had when I first started.",
+  signoff: "Your dream. Your business. Let's build it together.",
+};

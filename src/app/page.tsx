@@ -9,6 +9,7 @@ import { InteriorGallery } from "@/components/gallery/InteriorGallery";
 import { Spotlight } from "@/components/gallery/Spotlight";
 import { SoundVideo } from "@/components/media/Videos";
 import { CtaBand, FeatureCards, SectionHead } from "@/components/sections/Sections";
+import { FounderTeaser } from "@/components/sections/Founder";
 import { BUILDS, INTERIORS, MENDOZA_SPECS, PILLARS, SERVICES } from "@/lib/content";
 import { site } from "@/lib/site";
 import { pageMetadata } from "@/lib/seo";
@@ -105,6 +106,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <FounderTeaser />
 
       <section className="section plate border-y">
         <div className="wrap">

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { pageMetadata } from "@/lib/seo";
+import { absoluteUrl, jsonLdString, pageMetadata } from "@/lib/seo";
 import { Icon } from "@/components/ui/Icon";
 import { SoundVideo } from "@/components/media/Videos";
 import { CtaBand, PageHero, SectionHead } from "@/components/sections/Sections";
+import { FounderStory } from "@/components/sections/Founder";
+import { FOUNDER } from "@/lib/content";
 import { instagramUrl, site } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
@@ -12,6 +14,19 @@ export const metadata: Metadata = pageMetadata({
   path: "/about",
   image: { url: "/assets/video/one-year.jpg", alt: "About Us — Meet David & Oliver Mendoza — Battle Born Custom Trailers" },
 });
+
+/** Tells search engines who the founder is (shows up in Google's knowledge results). */
+const founderJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: FOUNDER.name,
+  jobTitle: "Founder",
+  description: FOUNDER.intro,
+  homeLocation: { "@type": "Place", name: "Northern Nevada" },
+  worksFor: { "@type": "Organization", name: site.name, url: site.url },
+  url: absoluteUrl("/about#founder"),
+  sameAs: site.people.filter((p) => p.name === FOUNDER.name).map((p) => instagramUrl(p.instagram)),
+};
 
 export default function AboutPage() {
   return (
@@ -23,6 +38,9 @@ export default function AboutPage() {
         title="A dream between partners"
         lede="Battle Born Custom Trailers was founded by David and Oliver Mendoza to build custom food trailers — and to help people become business owners."
       />
+
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(founderJsonLd) }} />
+      <FounderStory />
 
       <section className="section">
         <div className="wrap split">
