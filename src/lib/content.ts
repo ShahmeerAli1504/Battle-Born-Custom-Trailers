@@ -141,13 +141,15 @@ export const TIMELINES = ["As soon as possible", "1–3 months", "3–6 months",
 export const HEARD_FROM = ["Instagram", "Facebook", "Google", "Referral / word of mouth", "Saw one of your trailers", "Other"] as const;
 export const LANGUAGES = ["English", "Español"] as const;
 
-/* ---------- Owner profiles (About page; short version of Oliver's on Home) ---------- */
+/* ---------- Co-founder profiles (full stories on About; equal side-by-side cards on Home) ---------- */
 export type OwnerProfile = {
   /** anchor on the About page: /about#<id> */
   id: string;
   name: string;
   initials: string;
   eyebrow: string;
+  /** one or two sentences for the home-page co-founder card — keep both about the same length */
+  teaser: string;
   titles: string[];
   facts: string[];
   intro: string;
@@ -158,11 +160,13 @@ export type OwnerProfile = {
 };
 
 export const FOUNDER: OwnerProfile = {
-  id: "founder",
+  id: "oliver",
   name: "Oliver Mendoza",
   initials: "OM",
-  eyebrow: "Meet the founder",
-  titles: ["Founder of Battle Born Custom Trailers", "Entrepreneur", "Business Owner"],
+  eyebrow: "Co-Founder",
+  teaser:
+    "Born and raised in Northern Nevada, I've built restaurants, taco shops, meat markets, and a coffee shop — and I'm here to help you skip the costly mistakes I made starting out.",
+  titles: ["Co-Founder, Battle Born Custom Trailers", "Operations & Builds", "Entrepreneur & Business Owner"],
   facts: ["28 years old", "Born & raised in Northern Nevada", "Restaurants · taco shops · meat markets · a coffee shop"],
   intro:
     "My name is Oliver Mendoza. I'm 28 years old, born and raised in Northern Nevada, and a proud local entrepreneur. Over the years, I've built and operated multiple businesses, including restaurants, taco shops, meat markets, and a coffee shop.",
@@ -174,15 +178,17 @@ export const FOUNDER: OwnerProfile = {
   ],
   highlight: { label: "My goal is simple", text: "Help others succeed, save them time and money, and give them the guidance I wish I had when I first started." },
   signoff: "Your dream. Your business. Let's build it together.",
-  signLabel: "Founder",
+  signLabel: "Co-Founder",
 };
 
 export const PARTNER: OwnerProfile = {
   id: "david",
   name: "David Mendoza",
   initials: "DM",
-  eyebrow: "Meet your partner",
-  titles: ["Partner, Battle Born Custom Trailers", "Sales & Project Specialist", "Owner of multiple food businesses"],
+  eyebrow: "Co-Founder",
+  teaser:
+    "I'm not just here to sell you a food trailer — I'm here to help you build a successful business, with real food-business experience behind every recommendation.",
+  titles: ["Co-Founder, Battle Born Custom Trailers", "Sales & Project Specialist", "Owner of multiple food businesses"],
   facts: ["Real food-business experience", "Designs & builds from scratch", "5-star customer reviews"],
   intro: "I'm not just here to sell you a food trailer — I'm here to help you build a successful business!",
   story: [
@@ -195,7 +201,8 @@ export const PARTNER: OwnerProfile = {
     stars: true,
   },
   signoff: "Your success is my priority. Let's build something great together!",
-  signLabel: "Partner",
+  signLabel: "Co-Founder",
 };
 
-export const OWNERS = [FOUNDER, PARTNER];
+/** Always listed David, then Oliver — same order as "David & Oliver Mendoza" across the site. */
+export const OWNERS = [PARTNER, FOUNDER];

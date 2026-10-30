@@ -22,7 +22,7 @@ const founderJsonLd = OWNERS.map((o) => ({
   name: o.name,
   jobTitle: o.signLabel,
   description: o.intro,
-  ...(o.id === "founder" ? { homeLocation: { "@type": "Place", name: "Northern Nevada" } } : {}),
+  ...(o.id === "oliver" ? { homeLocation: { "@type": "Place", name: "Northern Nevada" } } : {}),
   worksFor: { "@type": "Organization", name: site.name, url: site.url },
   url: absoluteUrl(`/about#${o.id}`),
   sameAs: site.people.filter((p) => p.name === o.name).map((p) => instagramUrl(p.instagram)),

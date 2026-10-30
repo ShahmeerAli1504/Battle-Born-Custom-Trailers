@@ -20,3 +20,6 @@ Thumbs.db
 
 # logs
 npm-debug.log*
+
+# QR code files (local only)
+/QR Code/

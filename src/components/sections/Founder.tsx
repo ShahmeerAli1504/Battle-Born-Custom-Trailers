@@ -79,48 +79,60 @@ export function OwnerStory({ profile, flip = false, tone = "warm" }: { profile: 
   );
 }
 
-/** Both owners, as on the About page. */
+/** Both co-founders, as on the About page — David, then Oliver (matches "David & Oliver" everywhere). */
 export function FounderStory() {
   return (
     <>
-      <OwnerStory profile={FOUNDER} />
-      <OwnerStory profile={PARTNER} flip tone="cool" />
+      <OwnerStory profile={PARTNER} tone="cool" />
+      <OwnerStory profile={FOUNDER} flip />
     </>
   );
 }
 
-/** Short version for the home page, linking to the full stories. */
+/** Home page: both co-founders side by side, with identical card layouts. */
 export function FounderTeaser() {
+  const duo = [
+    { profile: PARTNER, tone: "cool" as const },
+    { profile: FOUNDER, tone: "warm" as const },
+  ];
   return (
     <section className="section founder" aria-labelledby="founder-teaser-title">
-      <div className="wrap founder-grid teaser">
-        <div className="founder-card reveal">
-          <Monogram initials={FOUNDER.initials} />
-          <span className="eyebrow">{FOUNDER.eyebrow}</span>
-          <h2 id="founder-teaser-title">{FOUNDER.name}</h2>
-          <ul className="founder-titles">
-            {FOUNDER.titles.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="founder-story">
-          <p className="founder-intro reveal">{FOUNDER.intro}</p>
-          <p className="reveal" data-delay="1">
-            {FOUNDER.story[0]} {FOUNDER.story[1]}
+      <div className="wrap">
+        <div className="cofounders-head">
+          <span className="eyebrow reveal">Meet the co-founders</span>
+          <h2 id="founder-teaser-title" className="reveal" data-delay="1">
+            David &amp; Oliver Mendoza
+          </h2>
+          <p className="lede reveal" data-delay="2">
+            Two co-founders, one mission: build your trailer right and help you run a business that lasts.
           </p>
-          <p className="founder-signoff reveal" data-delay="2">
-            {FOUNDER.signoff}
-          </p>
-          <div className="founder-links reveal" data-delay="2">
-            <Link className="text-link" href={`/about#${FOUNDER.id}`}>
-              Read Oliver&apos;s story <Icon name="arrow" />
-            </Link>
-            <Link className="text-link" href={`/about#${PARTNER.id}`}>
-              Meet David, your partner <Icon name="arrow" />
-            </Link>
-          </div>
         </div>
+        <div className="cofounders">
+          {duo.map(({ profile, tone }, i) => {
+            const person = contactFor(profile.name);
+            const first = profile.name.split(" ")[0];
+            return (
+              <article key={profile.id} className={clsx("cofounder-card reveal", tone === "cool" && "cool")} data-delay={i + 1}>
+                <Monogram initials={profile.initials} />
+                <span className="eyebrow">{profile.eyebrow}</span>
+                <h3>{profile.name}</h3>
+                {person && <div className="cofounder-role">{person.shortRole}</div>}
+                <p>{profile.teaser}</p>
+                <div className="cofounder-actions">
+                  <Link className="text-link" href={`/about#${profile.id}`}>
+                    Read {first}&apos;s story <Icon name="arrow" />
+                  </Link>
+                  {person && (
+                    <a className="text-link" href={`tel:${person.tel}`}>
+                      <Icon name="phone" /> {person.phone}
+                    </a>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+        <p className="founder-signoff cofounders-signoff reveal">Your dream. Your business. Let&apos;s build it together.</p>
       </div>
     </section>
   );

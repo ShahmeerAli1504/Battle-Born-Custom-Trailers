@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Icon } from "@/components/ui/Icon";
 import type { Feature } from "@/lib/content";
-import { primaryPhone } from "@/lib/site";
+import { site } from "@/lib/site";
 import { breadcrumbJsonLd, jsonLdString } from "@/lib/seo";
 
 export function PageHero({ crumb, path, eyebrow, title, lede }: { crumb: string; path?: string; eyebrow: string; title: string; lede: ReactNode }) {
@@ -85,10 +85,12 @@ export function CtaBand() {
             <Link className="btn btn-spark" href="/contact">
               Start Your Build <Icon name="arrow" />
             </Link>
-            <a className="btn btn-ghost" href={`tel:${primaryPhone.tel}`}>
-              <Icon name="phone" />
-              {primaryPhone.phone}
-            </a>
+            {site.people.map((p) => (
+              <a key={p.tel} className="btn btn-ghost" href={`tel:${p.tel}`}>
+                <Icon name="phone" />
+                {p.name.split(" ")[0]} · {p.phone}
+              </a>
+            ))}
             <EsBadge />
           </div>
         </div>
