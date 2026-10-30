@@ -80,6 +80,9 @@ export function CtaBand() {
               do, and a partnership that lasts.
             </p>
             <div className="fine">Free consultations • Transparent pricing • Licensed &amp; insured</div>
+            <div className="fine fine-2">
+              Financing assistance available — <Link href="/contact">contact us</Link> • Fast turnaround
+            </div>
           </div>
           <div className="actions">
             <Link className="btn btn-spark" href="/contact">

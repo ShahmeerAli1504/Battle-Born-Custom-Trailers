@@ -14,6 +14,7 @@ const services = [
 const explore = [
   { href: "/builds", label: "Completed Builds" },
   { href: "/interiors", label: "Interiors" },
+  { href: "/interiors#equipment", label: "Equipment Options" },
   { href: "/builds#videos", label: "Build Tours" },
   { href: "/builder", label: "Design Your Trailer" },
   { href: "/about", label: "Our Story" },

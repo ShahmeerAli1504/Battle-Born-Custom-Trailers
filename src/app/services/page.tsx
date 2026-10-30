@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import { CtaBand, FeatureCards, PageHero, SectionHead } from "@/components/sections/Sections";
+import { AssuranceStrip, CaliforniaBadge, ConsultingSupport } from "@/components/sections/Highlights";
 import { BEYOND, PROCESS, SERVICES, WHY_US } from "@/lib/content";
 
 export const metadata: Metadata = pageMetadata({
   title: "Food Trailer Building, Fabrication & Wrap Services",
-  description: "Custom food trailers, structural reinforcement, fabrication & welding, wraps & branding, permits and business consulting in Nevada — everything to launch a mobile food business.",
+  description: "Custom food trailers, fabrication & welding, wraps & branding, permits and business consulting from Nevada — California-certified builds, warranties, nationwide & worldwide delivery.",
   path: "/services",
   keywords: ["food trailer fabrication", "trailer welding Reno", "food truck wraps", "food truck permits Nevada", "food truck business consulting"],
 });
@@ -34,6 +35,16 @@ export default function ServicesPage() {
           </div>
         </div>
       </section>
+
+      <ConsultingSupport />
+
+      <section className="section">
+        <div className="wrap">
+          <AssuranceStrip />
+        </div>
+      </section>
+
+      <CaliforniaBadge />
 
       <section className="section plate border-y">
         <div className="wrap">
@@ -71,7 +82,7 @@ export default function ServicesPage() {
               </h2>
               <p className="lede reveal" data-delay="2">
                 A great trailer is just the beginning. We provide ongoing support and education to help you build a thriving, sustainable business —
-                especially for first-time entrepreneurs in the community.
+                especially for first-time entrepreneurs.
               </p>
             </div>
             <FeatureCards items={BEYOND} className="pillars two" />

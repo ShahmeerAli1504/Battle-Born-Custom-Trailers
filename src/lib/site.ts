@@ -8,7 +8,7 @@ export const site = {
   url: (process.env.NEXT_PUBLIC_SITE_URL || "https://battleborncustomtrailers.com").replace(/\/$/, ""),
   email: "battleborntrailers@gmail.com",
   region: "Nevada",
-  founded: 2025,
+  founded: 2024,
   people: [
     {
       name: "David Mendoza",

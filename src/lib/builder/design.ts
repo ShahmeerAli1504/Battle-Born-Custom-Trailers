@@ -86,7 +86,7 @@ export function emptyDesign(): Design {
   return {
     len: 20, wrap: "none", body: "#e9edf2", accent: "#c2cad4", trim: "#2a2f38", text: "#111317", font: "Big Shoulders Display",
     plate: false, lights: false, porch: false, chrome: false, propane: false, generator: false, smoker: false,
-    cuisine: "other", name: "", tag: "", phone: "", signText: "", equip: [], items: [],
+    cuisine: "other", name: "", tag: "", phone: "", signText: "", equip: ["sink3", "handsink"], items: [],
   };
 }
 
@@ -98,7 +98,7 @@ export function preset(kind: PresetKey): Design {
   };
   const P: Record<PresetKey, Partial<Design>> = {
     tacos: {},
-    bbq: { len: 20, wrap: "full", body: "#111317", accent: "#ff7a1a", trim: "#2a2f38", text: "#f2b705", font: "Rye", smoker: true, cuisine: "bbq", name: "Smokestack BBQ", tag: "Low & slow, every day", signText: "BBQ" },
+    bbq: { len: 20, wrap: "full", body: "#111317", accent: "#ff7a1a", trim: "#2a2f38", text: "#f2b705", font: "Rye", cuisine: "bbq", name: "Smokestack BBQ", tag: "Low & slow, every day", signText: "BBQ" },
     desserts: { len: 18, wrap: "full", body: "#ff4f9a", accent: "#ffffff", trim: "#111317", text: "#ffffff", font: "Pacifico", cuisine: "desserts", name: "Sweet Spot", tag: "Shakes · Sundaes · Treats", signText: "SHAKES", generator: false },
     coffee: { len: 14, wrap: "full", body: "#0f1b33", accent: "#c9a24a", trim: "#c9a24a", text: "#ffffff", font: "Lobster", cuisine: "coffee", name: "Rolling Roast", tag: "Espresso on the go", signText: "COFFEE", propane: false, porch: false },
     blank: { wrap: "none", body: "#f3f4f6", accent: "#9aa4b0", trim: "#111317", text: "#111317", lights: false, porch: false, name: "", tag: "", phone: "", signText: "", cuisine: "other" },
@@ -169,7 +169,7 @@ export function decodeDesign(code: string): Design | null {
 
 /** Equipment from earlier versions of the builder → today's closest item (null = no longer offered). */
 const OLD_EQUIP: Record<string, EquipKey | null> = {
-  griddle: "grill3", charbroil: "grill3", fryer: "fryer2", range: "stove6", wok: "stove4", warmer: "steam2",
+  griddle: "grill3", charbroil: "char3", fryer: "fryer2", range: "stove6", wok: "stove4", warmer: "steam2",
   reachin: "fridge1", freezer: "freezer1", prepfridge: "prep4", steam: "steam3",
   pizza: null, rice: null, ice: null, espresso: null, blender: null,
 };
@@ -185,6 +185,13 @@ export function migrateDesign(raw: unknown): unknown {
       .map((k) => (typeof k === "string" && k in OLD_EQUIP ? OLD_EQUIP[k] : k))
       .filter((k) => k !== null);
   }
+  // mandatory: every build has both sinks; the tongue smoker is no longer offered
+  if (Array.isArray(d.equip)) {
+    const eq = d.equip as unknown[];
+    if (!eq.includes("sink3")) eq.push("sink3");
+    if (!eq.includes("handsink")) eq.push("handsink");
+  }
+  d.smoker = false;
   if (Array.isArray(d.items)) d.items = d.items.filter((i) => !(i && typeof i === "object" && REMOVED_ITEMS.has(String((i as { type?: unknown }).type))));
   return d;
 }

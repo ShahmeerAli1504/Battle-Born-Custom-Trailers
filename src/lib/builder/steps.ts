@@ -33,8 +33,8 @@ export function requirements(step: StepKey, d: Design, picked: ReadonlySet<Pick>
     case "kitchen":
       return [
         { label: "Choose a cooking style", done: picked.has("cuisine") },
-        { label: "Keep the 3-compartment sink", done: d.equip.includes("sink3") },
-        { label: "Keep the hand-wash sink", done: d.equip.includes("handsink") },
+        { label: "Three-compartment sink (mandatory)", done: d.equip.includes("sink3") },
+        { label: "Separate hand-wash sink (mandatory)", done: d.equip.includes("handsink") },
         { label: "Fit the equipment in your trailer", done: d.equip.length > 0 && !pd.over },
       ];
   }

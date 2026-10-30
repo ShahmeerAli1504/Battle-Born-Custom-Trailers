@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/seo";
 import { InteriorGallery } from "@/components/gallery/InteriorGallery";
 import { CtaBand, FeatureCards, PageHero } from "@/components/sections/Sections";
+import { EquipmentOptions } from "@/components/sections/Highlights";
 import { INSIDE, INTERIORS } from "@/lib/content";
 
 export const metadata: Metadata = pageMetadata({
   title: "Commercial Food Trailer Kitchens & Interiors",
-  description: "Commercial-grade food trailer kitchens built in Nevada: stainless workstations, refrigeration, triple-basin sinks, hoods and fire suppression — built to pass health inspection.",
+  description: "Commercial-grade food trailer kitchens built in Nevada: undercounter refrigerators, charbroilers, stainless work tables, three-compartment and hand-wash sinks, hoods and fire suppression.",
   path: "/interiors",
   image: { url: "/assets/img/interiors/full-kitchen.jpg", alt: "Commercial Food Trailer Kitchens & Interiors — Battle Born Custom Trailers" },
   keywords: ["food trailer kitchen", "commercial mobile kitchen", "food truck interior", "NSF food trailer equipment"],
@@ -43,6 +44,8 @@ export default function InteriorsPage() {
           <FeatureCards items={INSIDE} className="pillars two" />
         </div>
       </section>
+
+      <EquipmentOptions />
 
       <CtaBand />
     </>

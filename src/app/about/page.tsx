@@ -5,6 +5,7 @@ import { Icon } from "@/components/ui/Icon";
 import { SoundVideo } from "@/components/media/Videos";
 import { CtaBand, PageHero, SectionHead } from "@/components/sections/Sections";
 import { FounderStory } from "@/components/sections/Founder";
+import { CompanyValues } from "@/components/sections/Highlights";
 import { OWNERS } from "@/lib/content";
 import { instagramUrl, site } from "@/lib/site";
 
@@ -42,15 +43,15 @@ export default function AboutPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(founderJsonLd) }} />
       <FounderStory />
 
-      <section className="section">
+      <section className="section scroll-mt-20" id="anniversary">
         <div className="wrap split">
           <div>
-            <span className="eyebrow reveal">One year in</span>
+            <span className="eyebrow reveal">Two years in</span>
             <h2 className="reveal" data-delay="1">
               Building futures, not just trailers
             </h2>
             <p className="lede reveal" data-delay="2">
-              One year ago this all started with a dream between business partners — a vision to build custom food trailers and help others start their
+              Two years ago this all started with a dream between business partners — a vision to build custom food trailers and help others start their
               own businesses.
             </p>
             <p className="reveal" data-delay="2">
@@ -58,17 +59,17 @@ export default function AboutPage() {
               of becoming business owners.
             </p>
             <p className="reveal" data-delay="3">
-              Through hard work, dedication, and faith, we&apos;ve been blessed with an incredible first year. We&apos;re truly grateful for every client
+              Through hard work, dedication, and faith, we&apos;ve been blessed with two incredible years. We&apos;re truly grateful for every client
               who trusted us, supported us, recommended us, and let us be part of their journey.
             </p>
             <p className="reveal" data-delay="3">
-              <b className="text-bone">This is only the beginning. Year 2 — we&apos;re building even bigger.</b>
+              <b className="text-bone">Thank you for two years. This is only the beginning — we&apos;re building even bigger.</b>
             </p>
           </div>
           <div className="story-video reveal" data-delay="1">
             <SoundVideo src="/assets/video/one-year.mp4" poster="/assets/video/one-year.jpg" label="One year of Battle Born">
               <div className="badge">
-                <small>Anniversary</small>1 Year
+                <small>Anniversary</small>2 Years
               </div>
             </SoundVideo>
           </div>
@@ -79,11 +80,13 @@ export default function AboutPage() {
         <div className="wrap">
           <span className="eyebrow reveal">Our mission</span>
           <p className="quote reveal max-w-[26ch]" data-delay="1">
-            To empower hardworking entrepreneurs — especially in the Hispanic community — with world-class custom trailers and the mentorship they need to
+            To empower hardworking entrepreneurs with world-class custom trailers and the mentorship they need to
             build sustainable, profitable mobile businesses.
           </p>
         </div>
       </section>
+
+      <CompanyValues />
 
       <section className="section scroll-mt-20" id="team">
         <div className="wrap">

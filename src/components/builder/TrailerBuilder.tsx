@@ -656,7 +656,7 @@ export function TrailerBuilder() {
                             cuisine: k as CuisineKey,
                             equip: [...CUISINES[k].equip],
                             signText: !d.signText || d.signText === oldSign ? CUISINES[k].sign : d.signText,
-                            smoker: k === "bbq" ? true : d.smoker,
+                            smoker: false,
                           };
                         });
                         markPicked("cuisine");
@@ -694,7 +694,7 @@ export function TrailerBuilder() {
                               <button
                                 type="button"
                                 aria-label={`Remove one ${EQUIP[k].n}`}
-                                disabled={qty === 0}
+                                disabled={qty === 0 || (!!EQUIP[k].req && qty <= 1)}
                                 onClick={() =>
                                   change((d) => {
                                     const at = d.equip.lastIndexOf(k);

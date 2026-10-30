@@ -10,7 +10,8 @@ import { Spotlight } from "@/components/gallery/Spotlight";
 import { SoundVideo } from "@/components/media/Videos";
 import { CtaBand, FeatureCards, SectionHead } from "@/components/sections/Sections";
 import { FounderTeaser } from "@/components/sections/Founder";
-import { BUILDS, INTERIORS, MENDOZA_SPECS, PILLARS, SERVICES } from "@/lib/content";
+import { AnniversaryBanner, AssuranceStrip, CaliforniaBadge } from "@/components/sections/Highlights";
+import { BUILDS, INTERIORS, MAIN_MESSAGE, MENDOZA_SPECS, PILLARS, SERVICES } from "@/lib/content";
 import { site } from "@/lib/site";
 import { pageMetadata } from "@/lib/seo";
 
@@ -21,7 +22,7 @@ export const metadata: Metadata = pageMetadata({
   path: "/",
 });
 
-const MARQUEE = ["Custom Food Trailers", "Mobile Kitchens", "Fabrication & Welding", "Custom Wraps", "Permits & Compliance", "Hablamos Español"];
+const MARQUEE = ["Custom Food Trailers", "California Certified", "Nationwide & Worldwide Delivery", "Fabrication & Welding", "Custom Wraps", "Hablamos Español"];
 
 export default function HomePage() {
   return (
@@ -50,7 +51,8 @@ export default function HomePage() {
             </div>
             <div className="hero-badges reveal" data-delay="3">
               <span>Licensed &amp; insured</span>
-              <span>NSF-certified equipment</span>
+              <span>California certified</span>
+              <span>Warranty included</span>
               <span>Hablamos Español</span>
             </div>
           </div>
@@ -69,6 +71,8 @@ export default function HomePage() {
           ))}
         </div>
       </div>
+
+      <AnniversaryBanner />
 
       <section className="section">
         <div className="wrap">
@@ -96,13 +100,20 @@ export default function HomePage() {
               <span className="eyebrow">More than builders</span>
               <h2>We&apos;re your partners</h2>
             </div>
-            <p className="lede reveal" data-delay="1">
-              At Battle Born Custom Trailers, we don&apos;t just build mobile kitchens. We build futures. Every trailer we craft is a launchpad for
-              someone&apos;s dream of entrepreneurship.
-            </p>
+            <div>
+              <p className="lede reveal" data-delay="1">
+                {MAIN_MESSAGE}
+              </p>
+              <Link className="text-link reveal mt-5" data-delay="2" href="/services#consulting-support">
+                How we help beyond the build <Icon name="arrow" />
+              </Link>
+            </div>
           </div>
           <div className="mt-10">
             <FeatureCards items={PILLARS} />
+          </div>
+          <div className="mt-[clamp(50px,7vw,90px)]">
+            <AssuranceStrip />
           </div>
         </div>
       </section>
@@ -178,6 +189,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <CaliforniaBadge />
+
       <section className="section bg-ink border-y">
         <div className="wrap">
           <SectionHead eyebrow="Step inside excellence" title="Kitchens built to code">
@@ -185,9 +198,12 @@ export default function HomePage() {
             business owners.
           </SectionHead>
           <InteriorGallery items={INTERIORS.slice(0, 3)} />
-          <div className="center mt-10">
+          <div className="center mt-10 flex flex-wrap justify-center gap-x-8 gap-y-3">
             <Link className="text-link" href="/interiors">
               Explore interiors <Icon name="arrow" />
+            </Link>
+            <Link className="text-link" href="/interiors#equipment">
+              See equipment options <Icon name="arrow" />
             </Link>
           </div>
         </div>
@@ -218,7 +234,7 @@ export default function HomePage() {
           <div className="story-video reveal">
             <SoundVideo src="/assets/video/team.mp4" poster="/assets/video/tour-loop.jpg" label="The Battle Born team">
               <div className="badge">
-                <small>Est. {site.founded}</small>Year 1
+                <small>Anniversary</small>2 Years
               </div>
             </SoundVideo>
           </div>
@@ -228,15 +244,15 @@ export default function HomePage() {
               It started with a dream
             </h2>
             <p className="lede reveal" data-delay="2">
-              One year ago, Battle Born began as a vision between business partners: build custom food trailers and help others start their own
+              Two years ago, Battle Born began as a vision between business partners: build custom food trailers and help others start their own
               businesses.
             </p>
             <p className="reveal" data-delay="2">
               What began as an idea quickly became a mission — helping people bring their food concepts to life and guiding them through becoming business
-              owners. Through hard work, dedication, and faith, we&apos;ve been blessed with an incredible first year.
+              owners. Through hard work, dedication, and faith, we&apos;ve been blessed with two incredible years.
             </p>
             <p className="reveal" data-delay="3">
-              <b className="text-bone">This is only the beginning. Year 2 — we&apos;re building even bigger.</b>
+              <b className="text-bone">Thank you for two years. This is only the beginning — we&apos;re building even bigger.</b>
             </p>
             <Link className="text-link reveal" data-delay="3" href="/about">
               Meet the team <Icon name="arrow" />

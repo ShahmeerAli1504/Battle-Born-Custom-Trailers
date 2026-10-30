@@ -82,9 +82,9 @@ export const SERVICES: Service[] = [
   { id: "custom", icon: "trailer", title: "Custom Food Trailers", text: "Fully customized mobile kitchens built to your exact specifications. From concept to completion, we design trailers that reflect your brand and business needs." },
   { id: "reinforcement", icon: "shield", title: "Structural Reinforcement", text: "Keep your mobile business running smoothly. We handle everything from equipment to the complete interior." },
   { id: "fabrication", icon: "flame", title: "Fabrication & Metalwork", text: "Custom metal fabrication, welding, and structural enhancements for food trucks and mobile units. Built for durability, safety, and long-lasting performance." },
-  { id: "consulting", icon: "chat", title: "Business Consulting", text: "Expert guidance on permits, health codes, location strategies, and menu optimization. We help you avoid costly mistakes and accelerate your success." },
+  { id: "consulting", icon: "chat", title: "Business Consulting", text: "Real-world guidance from owners of multiple local food businesses — supply distributors, POS and payment processing, equipment choices, operations and business setup. One-on-one support to help you start and grow." },
   { id: "branding", icon: "palette", title: "Custom Branding & Wraps", text: "Eye-catching wraps and signage that turn your trailer into a mobile billboard. Professional design that attracts customers." },
-  { id: "compliance", icon: "clipboard", title: "Compliance & Certification", text: "Navigate health department requirements, fire codes, and business permits. We make sure your trailer meets the regulations." },
+  { id: "compliance", icon: "clipboard", title: "Compliance & Certification", text: "Navigate health department requirements, fire codes, and business permits. We're certified to build food trailers for California, and every build is guaranteed to pass inspection to the agreed specifications." },
 ];
 
 export type Feature = { title: string; text: string; icon: IconName };
@@ -108,7 +108,7 @@ export const WHY_US: Feature[] = [
   { icon: "shield", title: "Premium materials only", text: "Commercial-grade stainless steel, NSF-certified equipment, and top-tier components. No shortcuts, ever." },
   { icon: "dollar", title: "Transparent pricing", text: "Detailed quotes with no hidden fees. You know exactly what you're paying for before we start." },
   { icon: "trend", title: "Real business know-how", text: "We've helped entrepreneurs launch and grow. We share what works — and what doesn't." },
-  { icon: "globe", title: "Hispanic community support", text: "A bilingual team that understands the unique challenges and opportunities in our community." },
+  { icon: "globe", title: "Hablamos Español", text: "A bilingual team — work with us in English or Spanish, from first call to final delivery." },
   { icon: "star", title: "Battle Born guarantee", text: "Our trailers are designed to withstand the demands of daily business." },
 ];
 
@@ -120,10 +120,65 @@ export const BEYOND: Feature[] = [
 ];
 
 export const INSIDE: Feature[] = [
-  { icon: "wrench", title: "Plumbing", text: "Triple-basin and hand-wash stations set up for health inspections." },
+  { icon: "wrench", title: "Plumbing", text: "A three-compartment sink and a separate hand-wash sink — both mandatory in every build." },
   { icon: "flame", title: "Hood & fire", text: "Exhaust hoods with fire-suppression integration." },
   { icon: "award", title: "Electrical", text: "Power planned for your equipment list, not an afterthought." },
   { icon: "list", title: "Layout", text: "Prep, cook and serve lines designed for high-volume service." },
+];
+
+/* ---------- Equipment & build options (Interiors page, #equipment) ---------- */
+export type OptionGroup = { title: string; icon: IconName; items: string[]; note?: string };
+
+export const EQUIPMENT_OPTIONS: OptionGroup[] = [
+  { icon: "list", title: "Undercounter refrigerators", items: ["Single-door refrigerator", "Double-door refrigerator", "Triple-door refrigerator"] },
+  { icon: "flame", title: "Charbroiler grills", items: ["2-foot charbroiler", "3-foot charbroiler", "4-foot charbroiler"] },
+  {
+    icon: "wrench",
+    title: "Stainless steel work tables",
+    items: ["Available in different sizes and lengths", "Custom sizes to fit your trailer's layout", "Commercial-grade stainless steel construction"],
+  },
+  { icon: "trailer", title: "Patio / porch options", items: ["Patio or porch add-on for your custom trailer", "Built to fit your trailer and service style", "Ask us about options for your build"] },
+];
+
+/** Both sinks are mandatory in every Battle Born food trailer build. */
+export const MANDATORY_EQUIPMENT = ["Three-compartment sink", "Separate handwashing sink"];
+
+/* ---------- Delivery, warranty, inspections & certification ---------- */
+export const ASSURANCES: Feature[] = [
+  { icon: "globe", title: "Nationwide & worldwide delivery", text: "We deliver your finished trailer across the U.S. and around the world." },
+  { icon: "shield", title: "Equipment warranty included", text: "The equipment in your build comes with warranty coverage." },
+  { icon: "award", title: "Trailer warranty included", text: "Your trailer itself is covered by our warranty too." },
+  { icon: "check", title: "Guaranteed to pass inspections", text: "Built to pass — based on the build specifications we agree on and your jurisdiction's requirements." },
+  { icon: "dollar", title: "Financing assistance", text: "We can also help with financing — if you need assistance, just contact us." },
+  { icon: "trend", title: "Fast turnaround", text: "Fast turnaround times on our builds, so you can start selling sooner." },
+];
+
+export const CALIFORNIA_POINTS = [
+  "Certified to build food trailers for California",
+  "California insignia included with California builds",
+  "Built to meet applicable California requirements",
+];
+
+/* ---------- About our company ---------- */
+export const COMPANY_VALUES: Feature[] = [
+  { icon: "pin", title: "Locally owned & operated", text: "Based right here in Nevada — not a large corporation." },
+  { icon: "users", title: "Independent & family-owned", text: "A legitimate, independent, family-owned business." },
+  { icon: "wrench", title: "Owners on the floor", text: "Our owners are directly involved in daily operations." },
+  { icon: "chat", title: "One-on-one service", text: "You work directly with us and get personalized, one-on-one service." },
+  { icon: "star", title: "Relationships first", text: "We take pride in building relationships with our customers, not just selling trailers." },
+];
+
+/* ---------- Business consulting & customer support ---------- */
+export const MAIN_MESSAGE =
+  "At Battle Born Custom Trailers, we don't just build food trailers — we help build businesses. As local business owners ourselves, we understand what it takes to start, operate, and grow a successful food business. We're here to help our customers every step of the way.";
+
+export const CONSULTING: Feature[] = [
+  { icon: "trailer", title: "Supply distributors", text: "Helping you find reliable food and restaurant supply distributors." },
+  { icon: "dollar", title: "POS & payments", text: "Recommendations on POS systems and payment processing." },
+  { icon: "flame", title: "The right equipment", text: "Advice on choosing the right equipment for your menu and business." },
+  { icon: "clipboard", title: "Operations & setup", text: "Guidance on food trailer operations and business setup." },
+  { icon: "trend", title: "What works", text: "Our experience on what works — and what doesn't — in the food industry." },
+  { icon: "users", title: "One-on-one support", text: "Personal support to help you start and grow your business." },
 ];
 
 /* ---------- Quote form options (shared by the form UI and the API validation) ---------- */

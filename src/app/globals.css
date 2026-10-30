@@ -715,3 +715,56 @@
     .founder-mark { width: 104px; height: 104px; font-size: 2.8rem; }
   }
 }
+
+/* ---------- Anniversary, assurances, California, equipment, mandatory sinks ---------- */
+@layer components {
+  .anniv { border-bottom: 1px solid var(--line); background: linear-gradient(90deg, rgba(255, 122, 26, 0.16), rgba(36, 87, 214, 0.16)), var(--ink); padding: 18px 0; }
+  .anniv-inner { display: flex; align-items: center; gap: 18px 26px; flex-wrap: wrap; }
+  .anniv-mark { display: flex; align-items: baseline; gap: 6px; font-family: var(--f-display); font-weight: 800; text-transform: uppercase; color: var(--spark); line-height: 1; }
+  .anniv-mark b { font-size: 2.6rem; }
+  .anniv-mark span { font-size: 1.2rem; letter-spacing: 0.06em; color: var(--white); }
+  .anniv p { flex: 1 1 320px; margin: 0; color: var(--steel); }
+  .anniv p b { color: var(--white); }
+
+  .fine-print { margin: 14px 0 0; font-size: 0.85rem; color: var(--steel-dim); }
+  .cta-band .fine-2 { margin-top: 8px; }
+  .cta-band .fine a { color: var(--white); text-decoration: underline; text-underline-offset: 3px; }
+
+  .ca-cert {
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    background: radial-gradient(ellipse 60% 80% at 0% 50%, rgba(255, 201, 64, 0.12), transparent 60%), var(--ink);
+  }
+  .ca-grid { display: grid; grid-template-columns: auto 1fr; gap: clamp(28px, 5vw, 70px); align-items: center; }
+  .ca-seal {
+    position: relative; width: clamp(150px, 18vw, 200px); aspect-ratio: 1; border-radius: 50%; display: grid; place-content: center; text-align: center;
+    background: radial-gradient(circle at 30% 25%, #ffe08a, #e0a91c 55%, #9c6d05); color: #2a1a00;
+    box-shadow: 0 0 0 6px rgba(255, 201, 64, 0.18), 0 30px 60px -24px rgba(255, 201, 64, 0.6), inset 0 0 0 3px rgba(255, 255, 255, 0.35);
+  }
+  .ca-seal b { font-family: var(--f-display); font-weight: 800; font-size: clamp(3rem, 6vw, 4.4rem); line-height: 0.9; }
+  .ca-seal span { font-family: var(--f-label); font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; font-size: 0.8rem; }
+  .ca-seal .star { position: absolute; top: 14%; left: 50%; width: 22px; height: 22px; transform: translateX(-50%); color: #2a1a00; }
+
+  .equip-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .equip-card ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
+  .equip-card li { position: relative; padding-left: 18px; color: var(--steel); }
+  .equip-card li::before { content: ""; position: absolute; left: 0; top: 0.6em; width: 7px; height: 7px; border-radius: 2px; background: var(--spark); }
+
+  .mandatory {
+    margin-top: 22px; display: grid; grid-template-columns: auto 1fr auto; gap: 18px 30px; align-items: center; padding: clamp(22px, 3vw, 32px);
+    border: 1px solid rgba(36, 87, 214, 0.55); border-radius: var(--radius); background: linear-gradient(120deg, rgba(36, 87, 214, 0.2), rgba(36, 87, 214, 0.05)), var(--panel);
+  }
+  .mandatory-tag { font-family: var(--f-label); font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; font-size: 0.85rem; padding: 0.5em 1em; border-radius: 999px; background: var(--blue); color: #fff; }
+  .mandatory h3 { margin: 0 0 0.25em; }
+  .mandatory p { margin: 0; color: var(--steel-dim); }
+  .mandatory ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .mandatory li { display: flex; align-items: center; gap: 10px; color: var(--white); font-weight: 600; white-space: nowrap; }
+  .mandatory li svg { width: 20px; height: 20px; color: #8fb0ff; flex: none; }
+
+  @media (max-width: 1000px) { .equip-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 760px) {
+    .ca-grid { grid-template-columns: 1fr; justify-items: start; }
+    .mandatory { grid-template-columns: 1fr; }
+    .mandatory li { white-space: normal; }
+  }
+  @media (max-width: 560px) { .equip-grid { grid-template-columns: 1fr; } }
+}

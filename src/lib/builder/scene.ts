@@ -28,10 +28,9 @@ export const lum = (hex: string) => {
 export const axles = (L: number) => (L <= 14 ? 1 : L <= 24 ? 2 : 3);
 export const AXLE_LABEL = ["", "Single axle", "Tandem axle", "Triple axle"] as const;
 
-type TonguePart = ["smoker" | "generator" | "propane", number];
+type TonguePart = ["generator" | "propane", number];
 function tongueParts(d: Design): TonguePart[] {
   const p: TonguePart[] = [];
-  if (d.smoker) p.push(["smoker", 118]);
   if (d.generator) p.push(["generator", 62]);
   if (d.propane) p.push(["propane", 58]);
   return p;
@@ -226,7 +225,6 @@ export function renderExterior(d: Design, night: boolean): string {
     tpos = x - 8;
     if (k === "propane") s += `<g><rect x="${x}" y="${ty - 74}" width="26" height="70" rx="12" fill="#f3f4f6" stroke="#9aa4b0" stroke-width="2"/><rect x="${x + 30}" y="${ty - 74}" width="26" height="70" rx="12" fill="#f3f4f6" stroke="#9aa4b0" stroke-width="2"/><rect x="${x + 8}" y="${ty - 84}" width="10" height="10" rx="2" fill="#9aa4b0"/><rect x="${x + 38}" y="${ty - 84}" width="10" height="10" rx="2" fill="#9aa4b0"/></g>`;
     if (k === "generator") s += `<g><rect x="${x}" y="${ty - 64}" width="${w}" height="58" rx="4" fill="url(#plate)" stroke="#6d7684" stroke-width="2"/><rect x="${x + 8}" y="${ty - 56}" width="${w - 16}" height="6" rx="2" fill="#6d7684"/><text x="${x + w / 2}" y="${ty - 22}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="11" fill="#2a2f38" letter-spacing="1">GEN</text></g>`;
-    if (k === "smoker") s += `<g><rect x="${x + 6}" y="${ty - 58}" width="${w - 12}" height="52" rx="26" fill="#1b1d21" stroke="#3a404a" stroke-width="3"/><rect x="${x + w - 30}" y="${ty - 112}" width="14" height="58" fill="#1b1d21"/><rect x="${x + w - 34}" y="${ty - 118}" width="22" height="8" rx="2" fill="#2a2f38"/><path d="M${x + 20} ${ty - 34} h${w - 46}" stroke="#3a404a" stroke-width="3"/><rect x="${x + w / 2 - 10}" y="${ty - 40}" width="20" height="5" rx="2" fill="#9aa4b0"/>${night ? `<circle cx="${x + w - 23}" cy="${ty - 130}" r="10" fill="#ffb066" opacity=".2" filter="url(#glow)"/>` : ""}<path d="M${x + w - 23} ${ty - 124} q-10 -14 2 -26 q10 -12 -2 -26" fill="none" stroke="${night ? "#5b6677" : "#b8c0c9"}" stroke-width="5" stroke-linecap="round" opacity=".7"/></g>`;
   }
 
   // chassis, wheels, fenders
@@ -419,11 +417,10 @@ export function specList(d: Design): [string, string][] {
   const o: string[] = [];
   if (d.plate) o.push("diamond plate");
   if (d.lights) o.push("marquee lights");
-  if (d.porch) o.push("rear porch");
+  if (d.porch) o.push("patio / porch");
   if (d.chrome) o.push("chrome wheels");
   if (d.propane) o.push("propane tanks");
   if (d.generator) o.push("generator box");
-  if (d.smoker) o.push("BBQ smoker");
   if (o.length) out.push(["Options", o.join(", ")]);
   if (cnt("sign") && d.signText) out.push(["Roof sign", `"${d.signText}"`]);
   out.push(["Kitchen", equipCounts(d.equip).map(([k, n]) => (n > 1 ? `${n}× ${EQUIP[k].n}` : EQUIP[k].n)).join(", ") + (pd.hasCook ? ", hood + fire suppression" : "")]);
@@ -468,9 +465,9 @@ export function specSections(d: Design): SpecSection[] {
         { label: "Axles", value: `${axles(d.len)} (${["", "single", "tandem", "triple"][axles(d.len)]})` },
         { label: "Diamond plate", value: yes(d.plate) },
         { label: "Marquee lights", value: yes(d.lights) },
-        { label: "Rear porch", value: yes(d.porch) },
+        { label: "Patio / porch", value: yes(d.porch) },
         { label: "Chrome wheels", value: yes(d.chrome) },
-        { label: "On the tongue", value: [d.propane && "Propane tanks", d.generator && "Generator box", d.smoker && "BBQ smoker"].filter(Boolean).join(", ") || "Nothing" },
+        { label: "On the tongue", value: [d.propane && "Propane tanks", d.generator && "Generator box"].filter(Boolean).join(", ") || "Nothing" },
       ],
     },
     {

@@ -45,6 +45,9 @@ export type EquipKey =
   | "stove2" | "stove4" | "stove6"
   | "grill2" | "grill3" | "grill4"
   | "fridge1" | "fridge2"
+  | "ucfridge1" | "ucfridge2" | "ucfridge3"
+  | "char2" | "char3" | "char4"
+  | "table2" | "table3" | "table4" | "table6"
   | "freezer1" | "freezer2"
   | "prep2" | "prep3" | "prep4" | "prep5"
   | "sink3" | "handsink";
@@ -65,14 +68,24 @@ export const EQUIP: Record<EquipKey, Equip> = {
   grill4: { n: "4 ft flat-top grill", w: 4, row: "b", cook: true },
   fridge1: { n: "Single-door upright refrigerator", w: 2.5, row: "b", cold: true },
   fridge2: { n: "Double-door upright refrigerator", w: 4.5, row: "b", cold: true },
+  ucfridge1: { n: "Single-door undercounter refrigerator", w: 2.5, row: "f", cold: true },
+  ucfridge2: { n: "Double-door undercounter refrigerator", w: 4, row: "f", cold: true },
+  ucfridge3: { n: "Triple-door undercounter refrigerator", w: 6, row: "f", cold: true },
+  char2: { n: "2 ft charbroiler grill", w: 2, row: "b", cook: true },
+  char3: { n: "3 ft charbroiler grill", w: 3, row: "b", cook: true },
+  char4: { n: "4 ft charbroiler grill", w: 4, row: "b", cook: true },
+  table2: { n: "2 ft stainless work table", w: 2, row: "f" },
+  table3: { n: "3 ft stainless work table", w: 3, row: "f" },
+  table4: { n: "4 ft stainless work table", w: 4, row: "f" },
+  table6: { n: "6 ft stainless work table", w: 6, row: "f" },
   freezer1: { n: "Single-door upright freezer", w: 2.5, row: "b", cold: true },
   freezer2: { n: "Double-door upright freezer", w: 4.5, row: "b", cold: true },
   prep2: { n: "2 ft cold prep table", w: 2, row: "f", cold: true },
   prep3: { n: "3 ft cold prep table", w: 3, row: "f", cold: true },
   prep4: { n: "4 ft cold prep table", w: 4, row: "f", cold: true },
   prep5: { n: "5 ft cold prep table", w: 5, row: "f", cold: true },
-  sink3: { n: "3-compartment sink", w: 5, row: "f", req: true },
-  handsink: { n: "Hand-wash sink", w: 1.5, row: "f", req: true },
+  sink3: { n: "Three-compartment sink", w: 5, row: "f", req: true },
+  handsink: { n: "Separate hand-wash sink", w: 1.5, row: "f", req: true },
 };
 export const EQUIP_KEYS = Object.keys(EQUIP) as EquipKey[];
 
@@ -82,10 +95,13 @@ export const EQUIP_GROUPS: { title: string; keys: EquipKey[]; note?: string }[] 
   { title: "Steam tables", keys: ["steam1", "steam2", "steam3"] },
   { title: "Burners", keys: ["stove2", "stove4", "stove6"] },
   { title: "Flat-top grills", keys: ["grill2", "grill3", "grill4"] },
-  { title: "Refrigerators", keys: ["fridge1", "fridge2"] },
+  { title: "Charbroiler grills", keys: ["char2", "char3", "char4"] },
+  { title: "Upright refrigerators", keys: ["fridge1", "fridge2"] },
+  { title: "Undercounter refrigerators", keys: ["ucfridge1", "ucfridge2", "ucfridge3"] },
   { title: "Freezers", keys: ["freezer1", "freezer2"] },
   { title: "Cold prep tables", keys: ["prep2", "prep3", "prep4", "prep5"] },
-  { title: "Sinks", keys: ["sink3", "handsink"], note: "Required by the health department" },
+  { title: "Stainless steel work tables", keys: ["table2", "table3", "table4", "table6"], note: "Custom sizes built to fit your layout" },
+  { title: "Sinks", keys: ["sink3", "handsink"], note: "Mandatory in every build — both sinks are always included" },
 ];
 /** Most of one item a customer can add. */
 export const MAX_QTY = 4;
@@ -120,15 +136,14 @@ export const GADGETS: Record<GadgetType, { n: string; w: number }> = {
 export const GADGET_TYPES = Object.keys(GADGETS) as GadgetType[];
 export const PALETTE: GadgetType[] = ["window", "window_s", "awning", "counter", "door", "tv", "ac", "sign", "text"];
 
-export type ExteriorOption = "plate" | "lights" | "porch" | "chrome" | "propane" | "generator" | "smoker";
+export type ExteriorOption = "plate" | "lights" | "porch" | "chrome" | "propane" | "generator";
 export const EXTERIOR_OPTIONS: { key: ExteriorOption; label: string; group: "exterior" | "tongue" }[] = [
   { key: "plate", label: "Diamond plate", group: "exterior" },
   { key: "lights", label: "Marquee lights", group: "exterior" },
-  { key: "porch", label: "Rear porch", group: "exterior" },
+  { key: "porch", label: "Patio / porch", group: "exterior" },
   { key: "chrome", label: "Chrome wheels", group: "exterior" },
   { key: "propane", label: "Propane tanks", group: "tongue" },
   { key: "generator", label: "Generator box", group: "tongue" },
-  { key: "smoker", label: "BBQ smoker", group: "tongue" },
 ];
 
 export type PresetKey = "tacos" | "bbq" | "desserts" | "coffee" | "blank";
