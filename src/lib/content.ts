@@ -34,6 +34,12 @@ export const BUILD_CATEGORIES: Record<BuildCategory, { tag: string; filter: stri
 
 /** The first build is shown large on /builds; the first 6 appear on the home page. */
 export const BUILDS: Build[] = [
+  { img: "/assets/img/builds/pollos-asados-oaxaquenos.jpg", title: "Los Oaxaqueños — Pollos Asados", text: "Full custom wrap, lit roof sign and rear patio deck", cat: "wrap" },
+  { img: "/assets/img/builds/las-comadres.jpg", title: "Las Comadres", text: "Illuminated roof sign, marquee lights and full wrap", cat: "wrap" },
+  { img: "/assets/img/builds/las-peribanas.jpg", title: "Las Peribanas", text: "Fruit & smoothie trailer with a bright custom wrap", cat: "wrap" },
+  { img: "/assets/img/builds/tacos-morelia.jpg", title: "Tacos Morelia", text: "Michoacán-style taco trailer with festive wrap and lighting", cat: "wrap" },
+  { img: "/assets/img/builds/el-patio.jpg", title: "El Patio", text: "Blacked-out build with agave graphics and LED lighting", cat: "wrap" },
+  { img: "/assets/img/builds/gloss-black-build.jpg", title: "Gloss Black Build", text: "Sleek all-black finish with LED trim and roof lights", cat: "clean" },
   { img: "/assets/img/builds/mendozas-food-truck.jpg", title: "Mendoza's Food Truck", text: "Colorful wrap with full equipment package", cat: "wrap" },
   { img: "/assets/img/builds/grand-pinoy-fiesta.jpg", title: "Grand Pinoy Fiesta", text: "Full custom build with professional kitchen setup", cat: "wrap" },
   { img: "/assets/img/builds/sweetheart-chicks-shakes.jpg", title: "Sweet Heart Chicks & Shakes", text: "Specialty dessert trailer with eye-catching design", cat: "wrap" },
@@ -44,10 +50,28 @@ export const BUILDS: Build[] = [
   { img: "/assets/img/builds/premium-red.jpg", title: "Premium Red Build", text: "Bold design with complete commercial kitchen", cat: "clean" },
   { img: "/assets/img/builds/bright-yellow.jpg", title: "Bright Yellow Build", text: "High-visibility trailer with professional finish", cat: "clean" },
   { img: "/assets/img/builds/clean-slate.jpg", title: "Custom Build — Clean Slate", text: "Professional foundation ready for customization", cat: "clean" },
+  { img: "/assets/img/builds/las-peribanas-patio.jpg", title: "Las Peribanas — Patio Deck", text: "Rear patio / porch with steel railing", cat: "wrap" },
+  { img: "/assets/img/builds/las-comadres-sunset.jpg", title: "Las Comadres — On Location", text: "Ready for service at sunset", cat: "wrap" },
+  { img: "/assets/img/builds/tacos-morelia-side.jpg", title: "Tacos Morelia — Service Side", text: "Papel picado graphics and LED accent lighting", cat: "wrap" },
+  { img: "/assets/img/builds/sweetheart-wrap-install.jpg", title: "Sweet Heart — Wrap Install", text: "Custom graphics going on in the shop", cat: "shop" },
+  { img: "/assets/img/builds/shop-frames-and-wraps.jpg", title: "Frames & Wraps in Progress", text: "Multiple builds moving through the shop", cat: "shop" },
+  { img: "/assets/img/builds/shop-steel-frame.jpg", title: "Steel Frame Fabrication", text: "Every build starts with a welded steel frame", cat: "shop" },
+  { img: "/assets/img/builds/shop-welding-chassis.jpg", title: "Welding the Chassis", text: "Hand-welded, built to handle daily business", cat: "shop" },
+  { img: "/assets/img/builds/shop-insulated-panels.jpg", title: "Wall Panels Going On", text: "Panel walls installed over the steel frame", cat: "shop" },
+  { img: "/assets/img/builds/shop-frame-on-chassis.jpg", title: "Frame on the Chassis", text: "Body framing mounted and squared on the trailer", cat: "shop" },
   { img: "/assets/img/builds/workshop-in-progress.jpg", title: "Workshop in Progress", text: "Behind-the-scenes look at our fabrication process", cat: "shop" },
 ];
 
 export const INTERIORS: Photo[] = [
+  { img: "/assets/img/interiors/stainless-galley.jpg", title: "Full Stainless Galley", text: "Floor-to-ceiling stainless with diamond-plate flooring" },
+  { img: "/assets/img/interiors/cook-line.jpg", title: "Cook Line", text: "Fryer and flat-top under a full exhaust hood" },
+  { img: "/assets/img/interiors/sinks-and-ac.jpg", title: "Three-Compartment Sink", text: "Mandatory sinks, plus A/C to keep the crew comfortable" },
+  { img: "/assets/img/interiors/hood-and-cabinets.jpg", title: "Hood & Custom Cabinets", text: "Stainless counters over white custom cabinetry" },
+  { img: "/assets/img/interiors/service-side-prep.jpg", title: "Service-Side Prep", text: "Long prep counters running the length of the windows" },
+  { img: "/assets/img/interiors/sink-station.jpg", title: "Sink Station", text: "Stainless sink station with mini-split A/C above" },
+  { img: "/assets/img/interiors/rear-door-cook-line.jpg", title: "Cook Line to Rear Door", text: "Clean workflow from the cook line to the back door" },
+  { img: "/assets/img/interiors/window-cabinets.jpg", title: "Window Framing & Cabinets", text: "Custom-framed service windows over built-in storage" },
+  { img: "/assets/img/interiors/service-window-counter.jpg", title: "Service Window Counter", text: "Wide service windows with storage below" },
   { img: "/assets/img/interiors/stainless-workstations.jpg", title: "Stainless-Steel Workstations", text: "Professional-grade prep stations built to commercial standards" },
   { img: "/assets/img/interiors/refrigeration.jpg", title: "Commercial Refrigeration Setup", text: "Industrial cooling systems with maximum storage efficiency" },
   { img: "/assets/img/interiors/service-window.jpg", title: "Custom Service Window Design", text: "Ergonomic customer-facing configurations" },
@@ -67,10 +91,25 @@ export const MENDOZA: Photo[] = [
   { img: "/assets/img/mendoza/mendoza-detail.jpg", title: "Mendoza's — Wrap Detail", text: "Custom branding, edge to edge" },
 ];
 
+/** Featured build on /builds: Los Oaxaqueños — Pollos Asados (photos + reel). */
+export const FEATURED_BUILD = {
+  title: "Los Oaxaqueños — Pollos Asados",
+  text: "A fully wrapped rotisserie-chicken trailer with an illuminated roof sign, a rear patio deck with railing, and a commercial kitchen inside.",
+  specs: ["Full custom wrap", "Roof sign", "Rear patio / porch", "Tandem axle", "Commercial kitchen"],
+  video: { src: "/assets/video/pollos-asados-reel.mp4", poster: "/assets/video/pollos-asados-reel.jpg" },
+  photos: [
+    { img: "/assets/img/builds/featured/pollos-asados-front.jpg", title: "Los Oaxaqueños — Street Side", text: "Edge-to-edge wrap with patio deck" },
+    { img: "/assets/img/builds/featured/pollos-asados-side.jpg", title: "Los Oaxaqueños — Service Side", text: "Menu board, roof sign and service window" },
+  ] as Photo[],
+};
+
 export const MENDOZA_SPECS = ["Triple axle", "Rooftop deck", "Full custom wrap", "LED lighting", "Commercial kitchen"];
 
 /** Vertical (9:16) videos for the "Build Tours" reel. Drop the .mp4 in public/assets/video/. */
 export const VIDEOS: Video[] = [
+  { src: "/assets/video/pollos-asados-reel.mp4", poster: "/assets/video/pollos-asados-reel.jpg", title: "Los Oaxaqueños — Pollos Asados", text: "Finished-build reel (en español)" },
+  { src: "/assets/video/lola-mameng-reel.mp4", poster: "/assets/video/lola-mameng-reel.jpg", title: "Lola Mameng's Kitchen Mafia", text: "Custom build reveal" },
+  { src: "/assets/video/in-the-shop.mp4", poster: "/assets/video/in-the-shop.jpg", title: "In the Shop", text: "Frames and chassis being welded" },
   { src: "/assets/video/team.mp4", poster: "/assets/video/team.jpg", title: "Pollos Asados — Build Tour", text: "A full walkthrough of a finished build (en español)" },
   { src: "/assets/video/one-year.mp4", poster: "/assets/video/one-year.jpg", title: "1 Year of Battle Born", text: "Where it all started" },
   { src: "/assets/video/tour-loop.mp4", poster: "/assets/video/tour-loop.jpg", title: "On the Lot", text: "Clip from a finished-build walkthrough" },

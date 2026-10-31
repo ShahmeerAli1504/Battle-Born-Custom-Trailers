@@ -136,7 +136,7 @@ export function ConsultingSupport() {
         </SectionHead>
         <FeatureCards items={CONSULTING} className="services-grid" />
         <div className="reveal mt-[clamp(50px,7vw,90px)]">
-          <p className="quote max-w-[34ch]">{MAIN_MESSAGE}</p>
+          <p className="quote quote-long">{MAIN_MESSAGE}</p>
           <div className="quote-by">— David &amp; Oliver Mendoza</div>
         </div>
       </div>

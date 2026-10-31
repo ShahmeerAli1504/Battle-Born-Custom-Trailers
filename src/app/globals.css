@@ -607,7 +607,9 @@
     .service-row { grid-template-columns: 60px 1fr; gap: 10px 20px; }
     .service-row p { grid-column: 2; }
     .story-video .badge { left: 10px; }
-    .lightbox { padding: 70px 12px; }
+    .lightbox { padding: 70px 12px 96px; }
+    .lightbox .frame { height: 62vh; }
+    .lightbox figcaption b { font-size: 1.3rem; }
     .lb-prev, .lb-next { top: auto; bottom: 16px; transform: none; }
     .lb-prev { left: calc(50% - 64px); }
     .lb-next { right: calc(50% - 64px); }
@@ -767,4 +769,14 @@
     .mandatory li { white-space: normal; }
   }
   @media (max-width: 560px) { .equip-grid { grid-template-columns: 1fr; } }
+}
+
+/* ---------- Featured build (Builds page) ---------- */
+@layer components {
+  /* long quotes (e.g. the main message) stay readable on phones */
+  .quote.quote-long { font-size: clamp(1.35rem, 2.7vw, 2.4rem); line-height: 1.12; max-width: 38ch; }
+  .featured-photos { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px; }
+  .featured-photos button { padding: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--panel); cursor: zoom-in; }
+  .featured-photos img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; transition: transform 0.8s var(--ease); }
+  .featured-photos button:hover img { transform: scale(1.05); }
 }
