@@ -10,7 +10,7 @@ const abs = (path: string) => `${site.url}${path}`;
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
   const page = (path: string, priority: number, changeFrequency: Entry["changeFrequency"], images: string[] = []): Entry => ({
-    url: path === "/" ? site.url : abs(path),
+    url: path === "/" ? `${site.url}/` : abs(path),
     lastModified,
     changeFrequency,
     priority,

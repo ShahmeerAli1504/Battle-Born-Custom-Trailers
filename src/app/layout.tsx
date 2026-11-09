@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     "Sparks NV food trailer",
     "remolques de comida Nevada",
   ],
-  alternates: { canonical: "/" },
+  alternates: { canonical: "./" },
   icons: { icon: "/assets/img/favicon.png", shortcut: "/assets/img/favicon.png", apple: "/assets/img/apple-touch-icon.png" },
   formatDetection: { telephone: true, email: true, address: false },
   robots: {
