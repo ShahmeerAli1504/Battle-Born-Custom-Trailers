@@ -82,6 +82,11 @@ export function SiteFooter() {
             © {new Date().getFullYear()} {site.name}. All rights reserved.
           </span>
           <span>Hablamos Español</span>
+          <a className="powered-by" href="https://www.nexoradigital.live/" target="_blank" rel="noopener noreferrer">
+            <span>Powered by</span>
+            <Image src="/assets/img/nexora-logo.png" alt="" width={24} height={24} />
+            <span>Nexora Digital</span>
+          </a>
         </div>
       </div>
     </footer>

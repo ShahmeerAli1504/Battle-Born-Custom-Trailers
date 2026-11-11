@@ -511,6 +511,9 @@
   .socials a:hover { color: var(--white); border-color: var(--spark); background: rgba(255, 122, 26, 0.12); }
   .socials svg { width: 18px; height: 18px; }
   .footer-bottom { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; color: var(--steel-dim); font-size: 0.92rem; }
+  .powered-by { display: inline-flex; align-items: center; gap: 8px; color: var(--steel-dim); transition: color 0.2s; }
+  .powered-by:hover { color: var(--white); }
+  .powered-by img { width: 24px; height: 24px; object-fit: contain; }
 
   /* ---------- Lightbox ---------- */
   .lightbox {
